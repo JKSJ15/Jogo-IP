@@ -2,7 +2,8 @@ import pygame
 from classes.Jogador import Jogador
 from classes.Letras import Letra
 from uteis.colisao import checar_colisao
-from constantes import LARGURA_TELA, ALTURA_TELA, FPS, VEL_JOGADOR, X_JOGADOR, Y_JOGADOR, COR_JOGADOR, VEL_LETRA
+from constantes import LARGURA_TELA, ALTURA_TELA, FPS, VEL_JOGADOR, X_JOGADOR, Y_JOGADOR, COR_JOGADOR, VEL_LETRA 
+from constantes import PALAVRAS_FASE1, PALAVRAS_FASE2, PALAVRAS_FASE3
 
 def main():
     pygame.init()
@@ -13,7 +14,7 @@ def main():
 
     # inicializações
     jogador = Jogador(X_JOGADOR, Y_JOGADOR, VEL_JOGADOR)
-    letra = Letra(VEL_LETRA)
+    letra = Letra(VEL_LETRA, "ABRACAO")
 
     # loop do jogo
     rodando = True
