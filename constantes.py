@@ -21,3 +21,7 @@ VEL_LETRA = 5
 
 # uteis
 PASTA_IMAGENS = "assets/images"
+
+# fase1
+# fase2
+# fase3
