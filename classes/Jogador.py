@@ -1,9 +1,11 @@
 import pygame
 from constantes import COR_JOGADOR, LARGURA_TELA, ALTURA_TELA
+from uteis.pegarReacao import pegarReacao
 
-class Jogador:
+class Jogador(pegarReacao):
     # inicialização
     def __init__(self, x, y, velocidade):
+        super().__init__()
         self.x = x
         self.y = y
         self.velocidade = velocidade
@@ -38,6 +40,3 @@ class Jogador:
     # desenhar o jogador na tela
     def desenhar(self, tela):
         pygame.draw.circle(tela, COR_JOGADOR, (self.x, self.y), 25)
-    
-    def get_rect(self):
-        return pygame.Rect(self.x, self.y, 50, 50)
