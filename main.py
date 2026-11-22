@@ -1,104 +1,95 @@
 import pygame
 from classes.Jogador import Jogador
-from classes.Letras import Letra
 from classes.Porta import Porta
+from classes.Fase import Fase
 from uteis.colisao import checar_colisao
-from constantes import LARGURA_TELA, ALTURA_TELA, FPS, VEL_JOGADOR, X_JOGADOR, Y_JOGADOR, COR_JOGADOR, VEL_LETRA 
+from constantes import (LARGURA_TELA, ALTURA_TELA, FPS, VEL_JOGADOR, X_JOGADOR, Y_JOGADOR)
 
 def main():
-    fase_atual = 0
-    frases_coletadas = 0
-    meta_frases = 25
-    letras = [Letra(VEL_LETRA, "ABRACAO"), Letra(VEL_LETRA, "AMOR"), Letra(VEL_LETRA, "PAZ"), Letra(VEL_LETRA, "FELICIDADE"), Letra(VEL_LETRA, "SAUDE")]
-
+    # inicia e configura o pygame
     pygame.init()
-
-    # tela e clock
     tela = pygame.display.set_mode((LARGURA_TELA, ALTURA_TELA))
     clock = pygame.time.Clock()
 
-    # inicializações
+    # Instanciando Objetos do Jogo
+    # Jogador
     jogador = Jogador(X_JOGADOR, Y_JOGADOR, VEL_JOGADOR)
-    porta = Porta(LARGURA_TELA - 50, ALTURA_TELA - 50, 50, 50)
+    
+    # Portas do menu
+    porta1 = Porta(100, 200, 100, 150)
+    porta2 = Porta(350, 200, 100, 150)
+    porta3 = Porta(600, 200, 100, 150)
 
-    # loop do jogo
+    # Fases
+    fase1 = Fase(1)
+    fase2 = Fase(2)
+    fase3 = Fase(3)
+
+    # looping principal do jogo
+    fase_escolhida = None
+    venceu = False
     rodando = True
     while rodando:
-        # teste de encerramento
+        # verificar saida do jogo
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
                 rodando = False
 
-        # pegando teclas pressionadas
+        # pegar teclas pressionadas
         teclas = pygame.key.get_pressed()
         if teclas[pygame.K_ESCAPE]:
             rodando = False
-        
-        # fase 0
-        if fase_atual == 0:
-            # desenhando tela
-            tela.fill((0, 0, 0))
-            jogador.desenhar(tela)
-            porta.desenhar(tela)
-            
-            # Movimentação no mapa inicial
+
+        # renderizar a tela
+        tela.fill((30, 30, 30))
+
+        # MENU DE SELEÇÃO - não escolheu fase
+        if fase_escolhida is None:
+
+            # desenhando Portas
+            porta1.desenhar(tela)
+            porta2.desenhar(tela)
+            porta3.desenhar(tela)
+
+            # movimentação e criação do jogador
             jogador.mover(teclas)
-
-            # Verificar colisão com a porta
-            if checar_colisao(jogador, porta):
-                fase_atual = 1
-
-        # fase 1
-        elif fase_atual == 1:
-            # desenhando tela
-            tela.fill((0, 0, 0))
             jogador.desenhar(tela)
 
-            # Movimentação do jogador
-            jogador.mover(teclas)
+            # Escolha da fase pela colisão
+            if checar_colisao(jogador, porta1):
+                fase_escolhida = fase1
 
-            # Movimentação das frases
-            for letra in letras:
-                letra.desenhar(tela)
-                letra.mover()
+            elif checar_colisao(jogador, porta2):
+                fase_escolhida = fase2
 
-                if checar_colisao(jogador, letra):
-                    frases_coletadas += 1
-                    letras.remove(letra)
+            elif checar_colisao(jogador, porta3):
+                fase_escolhida = fase3
 
-            # Verificar se atingiu a meta
-            if frases_coletadas >= meta_frases:
-                fase_atual = 2
+            # Reiniciar posição do jogador ao escolher
+            if fase_escolhida is not None:
+                jogador.x = X_JOGADOR
+                jogador.y = Y_JOGADOR
 
-        # fase 2
-        elif fase_atual == 2:
-            # desenhando tela
-            tela.fill((0, 0, 0))
-            jogador.desenhar(tela)
+        # EXECUTAR FASE ESCOLHIDA - após seleção de fase
+        else:
+            # Verificar conclusão da fase
+            venceu = fase_escolhida.iniciar(tela, teclas, jogador)
+            if venceu:
+                # fase 3 encerra o jogo
+                if fase_escolhida.numero_fase == 3:
+                    print("Você venceu!")
+                    rodando = False
+                else:
+                    # Outras fases voltam ao lobby
+                    fase_escolhida = None
+                    jogador.x = X_JOGADOR
+                    jogador.y = Y_JOGADOR
 
-            # Comportamento do terceiro cenário
-            jogador.mover(teclas)
-
-        # atualizando a tela e o clock
+        # atualizar a tela e controlar FPS
         pygame.display.flip()
         clock.tick(FPS)
-
-    # sair
+    # encerrar o pygame
     pygame.quit()
 
 if __name__ == "__main__":
     main()
-
-    """# movendo objetos
-            jogador.mover(teclas)
-            letra.mover()
-    
-            # limpando e desenhado objetos na tela
-            tela.fill((0, 0, 0))
-            jogador.desenhar(tela)
-            letra.desenhar(tela)
-    
-            # checando colisão
-            if checar_colisao(jogador, letra):
-                print("Colisão detectada!")
-                jogador.x = -100000"""
