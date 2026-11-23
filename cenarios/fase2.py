@@ -1,40 +1,18 @@
-import sys
 import pygame
+from constantes import (
+    NATIVE_W, NATIVE_H,
+    C_BG_FRAME, C_OUTLINE, C_WHITE,
+    C_WALL_LIGHT, C_WALL_MID, C_WALL_DARK,
+    C_BASEBOARD, C_FLOOR_TILE, C_FLOOR_GRID,
+    C_SHADOW, C_GLASS_BG, C_GLASS_SHADE,
+    C_GLASS_SHINE, C_METAL,
+    C_BLUE_LIGHT, C_BLUE_MID, C_BLUE_DARK, C_BLUE_DEEP
+)
 
-# --- Configurações de Tela (Proporção 4:3 estilo GBA escalada 3x) ---
-NATIVE_W, NATIVE_H = 320, 240
-SCALE = 3
-WINDOW_W, WINDOW_H = NATIVE_W * SCALE, NATIVE_H * SCALE
-FPS = 60
-
-# --- Paleta Pokémon FireRed (Branco, Cinza Moderno & Azul) ---
-C_BG_FRAME = (248, 249, 251)
-C_OUTLINE = (32, 36, 44)
-C_WHITE = (252, 253, 255)
-C_WALL_LIGHT = (232, 235, 240)
-C_WALL_MID = (206, 211, 219)
-C_WALL_DARK = (156, 163, 174)
-C_BASEBOARD = (102, 109, 120)
-
-C_FLOOR_TILE = (241, 244, 248)
-C_FLOOR_GRID = (205, 211, 220)
-C_SHADOW = (182, 190, 202)
-
-# Vidro da porta
-C_GLASS_BG = (212, 229, 242)
-C_GLASS_SHADE = (184, 206, 224)
-C_GLASS_SHINE = (245, 251, 255)
-C_METAL = (130, 140, 152)
-
-# Azul das almofadas e cadeira do professor
-C_BLUE_LIGHT = (122, 182, 248)
-C_BLUE_MID = (64, 134, 222)
-C_BLUE_DARK = (36, 84, 158)
-C_BLUE_DEEP = (24, 56, 112)
-
+canvas = pygame.Surface((NATIVE_W, NATIVE_H))
 
 def draw_room_architecture(surf):
-    """Desenha piso quadriculado, paredes em perspectiva GBA e interfone."""
+    # Desenha piso quadriculado, paredes em perspectiva GBA e interfone.
     surf.fill(C_BG_FRAME)
 
     # Paredes e piso interno
@@ -73,7 +51,7 @@ def draw_room_architecture(surf):
 
 
 def draw_full_glass_door(surf, x=34, y=24):
-    """Porta moderna toda de vidro com ferragens metálicas minimalistas."""
+    # Porta moderna toda de vidro com ferragens metálicas minimalistas.
     w, h = 32, 40
     # Sombra interna na parede
     pygame.draw.rect(surf, C_WALL_DARK, (x - 1, y - 1, w + 2, h + 1))
@@ -106,7 +84,7 @@ def draw_full_glass_door(surf, x=34, y=24):
 
 
 def draw_whiteboard(surf, x=110, y=15):
-    """Lousa branca interativa na parede superior central."""
+    # Lousa branca interativa na parede superior central.
     w, h = 100, 44
     pygame.draw.rect(surf, C_OUTLINE, (x, y, w, h))
     pygame.draw.rect(surf, C_WALL_DARK, (x + 1, y + 1, w - 2, h - 2))
@@ -140,7 +118,7 @@ def draw_whiteboard(surf, x=110, y=15):
 
 
 def draw_teacher_station(surf):
-    """Mesa branca inclinada do professor e cadeira giratória azul (canto superior direito)."""
+    # Mesa branca inclinada do professor e cadeira giratória azul (canto superior direito).
     # --- Mesa do professor (perspectiva 2.5D) ---
     desk_top = [(228, 52), (252, 52), (264, 74), (240, 74)]
     desk_front = [(240, 74), (264, 74), (264, 92), (240, 92)]
@@ -180,7 +158,7 @@ def draw_teacher_station(surf):
 
 
 def draw_center_table(surf, x=112, y=96):
-    """Mesa retangular central da 1ª fileira."""
+    # Mesa retangular central da 1ª fileira.
     w, h = 64, 26
     pygame.draw.rect(surf, C_SHADOW, (x + 2, y + h - 2, w - 4, 4))
     # Pernas frontais
@@ -225,53 +203,27 @@ def draw_student_chair(surf, x, y):
     pygame.draw.line(surf, C_BLUE_DEEP, (x + 3, y + 23), (x + 19, y + 23))
 
 
-def main():
-    pygame.init()
-    screen = pygame.display.set_mode((WINDOW_W, WINDOW_H))
-    pygame.display.set_caption("Sala Moderna (Almofadas Azuis & Porta de Vidro) - Pokémon FireRed")
-    native = pygame.Surface((NATIVE_W, NATIVE_H))
-    clock = pygame.time.Clock()
+def render_room():
+    draw_room_architecture(canvas)
 
-    # Coordenadas exatas das 8 colunas e 4 fileiras de assentos
+    draw_full_glass_door(canvas, x=34, y=24)
+    draw_whiteboard(canvas, x=110, y=15)
+    draw_teacher_station(canvas)
+    draw_center_table(canvas, x=112, y=96)
+
     cols_x = [32, 66, 100, 134, 168, 202, 236, 270]
     rows_y = [92, 128, 162, 196]
 
     chairs = []
-    # Fileira 1: 1 cadeira à esquerda, mesa central, 3 cadeiras à direita
+
     chairs.append((cols_x[0], rows_y[0]))
+
     for c in (5, 6, 7):
         chairs.append((cols_x[c], rows_y[0]))
 
-    # Fileiras 2, 3 e 4: 8 cadeiras distribuídas horizontalmente
     for r in (1, 2, 3):
         for cx in cols_x:
             chairs.append((cx, rows_y[r]))
 
-    while True:
-        clock.tick(FPS)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                pygame.quit()
-                sys.exit()
-
-        # Renderização da cena
-        draw_room_architecture(native)
-        draw_full_glass_door(native, x=34, y=24)
-        draw_whiteboard(native, x=110, y=15)
-        draw_teacher_station(native)
-        draw_center_table(native, x=112, y=96)
-
-        for cx, cy in chairs:
-            draw_student_chair(native, cx, cy)
-
-        # Escala 3x preservando a nitidez pixel-art
-        scaled = pygame.transform.scale(native, (WINDOW_W, WINDOW_H))
-        screen.blit(scaled, (0, 0))
-        pygame.display.flip()
-
-
-if __name__ == "__main__":
-    main()
+    for cx, cy in chairs:
+        draw_student_chair(canvas, cx, cy)
