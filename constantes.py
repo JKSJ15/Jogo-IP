@@ -99,3 +99,7 @@ C_BLUE_DARK = (36, 84, 158)
 C_BLUE_DEEP = (24, 56, 112)
 
 # FASE3
+# Resolução interna estilo GBA (pixel art) e janela escalada 3x
+INTERNAL_W, INTERNAL_H = 320, 240
+SCALE = 3
+SCREEN_W, SCREEN_H = INTERNAL_W * SCALE, INTERNAL_H * SCALE

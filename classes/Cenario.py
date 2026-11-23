@@ -8,6 +8,10 @@ from cenarios.fase2 import (
     canvas as canvas_fase2,
     render_room as render_room_fase2
 )
+from cenarios.fase3 import (
+    canvas as canvas_fase3,
+    render_room as render_room_fase3
+)
 
 class Cenario:
     def _desenhar(self, tela, canvas, render_room):
@@ -37,4 +41,4 @@ class Cenario:
         self._desenhar(tela, canvas_fase2, render_room_fase2)
 
     def desenharFase3(self, tela):
-        pass
+        self._desenhar(tela, canvas_fase3, render_room_fase3)
