@@ -1,11 +1,21 @@
 # CONFIGURAÇÕES GERAIS
 FPS = 60
 
-# Resolução da janela
-NATIVE_W, NATIVE_H = 320, 240
+# RESOLUÇÃO DA JANELA
+NATIVE_W = 320
+NATIVE_H = 240
 SCALE = 3
-LARGURA_TELA = NATIVE_W * SCALE # 960
-ALTURA_TELA = NATIVE_H * SCALE # 720
+
+LARGURA_TELA = NATIVE_W * SCALE
+ALTURA_TELA = NATIVE_H * SCALE
+
+# RESOLUÇÃO DOS CENÁRIOS
+TILE = 16
+COLS = 18
+ROWS = 18
+
+WIDTH = COLS * TILE
+HEIGHT = ROWS * TILE
 
 # CORES GERAIS
 BRANCO = (255, 255, 255)
@@ -98,8 +108,11 @@ C_BLUE_MID = (64, 134, 222)
 C_BLUE_DARK = (36, 84, 158)
 C_BLUE_DEEP = (24, 56, 112)
 
-# FASE3
-# Resolução interna estilo GBA (pixel art) e janela escalada 3x
-INTERNAL_W, INTERNAL_H = 320, 240
-SCALE = 3
-SCREEN_W, SCREEN_H = INTERNAL_W * SCALE, INTERNAL_H * SCALE
+# RESOLUÇÃO FASE 3
+INTERNAL_W = WIDTH
+INTERNAL_H = HEIGHT
+
+# PROFESSORES
+DIALOGO_FASE1 = ["Olá, como vai?", "Tem algo te esperando", "bom desafio!"]
+DIALOGO_FASE2 = ["Olá, como vai?", "Tem algo te esperando", "bom desafio!"]
+DIALOGO_FASE3 = ["Olá, como vai?", "Tem algo te esperando", "bom desafio!"]

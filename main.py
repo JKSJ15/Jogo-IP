@@ -4,20 +4,31 @@ from classes.Porta import Porta
 from classes.Fase import Fase
 from uteis.colisao import checar_colisao
 from constantes import (
-    LARGURA_TELA, ALTURA_TELA, FPS,
-    VEL_JOGADOR, X_JOGADOR, Y_JOGADOR
+    LARGURA_TELA,
+    ALTURA_TELA,
+    FPS,
+    VEL_JOGADOR,
+    X_JOGADOR,
+    Y_JOGADOR
 )
 
 def main():
     # Inicializa e configura o pygame
     pygame.init()
-    tela = pygame.display.set_mode((LARGURA_TELA, ALTURA_TELA))
-    pygame.display.set_caption("Jogo das Palavras")
+    tela = pygame.display.set_mode(
+        (LARGURA_TELA, ALTURA_TELA)
+    )
+    pygame.display.set_caption("Vamos CinBora")
     clock = pygame.time.Clock()
 
     # Instanciando objetos do jogo
-    jogador = Jogador(X_JOGADOR, Y_JOGADOR, VEL_JOGADOR)
-
+    # Jogador
+    jogador = Jogador(
+        X_JOGADOR,
+        Y_JOGADOR,
+        VEL_JOGADOR
+    )
+    
     # Portas do menu
     porta1 = Porta(100, 200, 100, 150)
     porta2 = Porta(350, 200, 100, 150)
@@ -28,15 +39,16 @@ def main():
     fase2 = Fase(2)
     fase3 = Fase(3)
 
-    # Variáveis de controle
+    # variáveis de controle
     fase_escolhida = None
-    venceu = False
     rodando = True
 
     # Loop principal
     while rodando:
+        eventos = pygame.event.get()
+
         # Verificar saída do jogo
-        for evento in pygame.event.get():
+        for evento in eventos:
             if evento.type == pygame.QUIT:
                 rodando = False
 
@@ -69,30 +81,21 @@ def main():
             if fase_escolhida is not None:
                 jogador.x = X_JOGADOR
                 jogador.y = Y_JOGADOR
+                fase_escolhida.reiniciar()
 
         # EXECUÇÃO DA FASE
         else:
-            venceu = fase_escolhida.iniciar(
-                tela,
-                teclas,
-                jogador
-            )
+            venceu = fase_escolhida.iniciar(tela, teclas, jogador, eventos)
             if venceu:
-                # A última fase encerra o jogo
                 if fase_escolhida.numero_fase == 3:
                     print("Você venceu!")
                     rodando = False
                 else:
-                    # Retorna ao menu
                     fase_escolhida = None
-
                     jogador.x = X_JOGADOR
                     jogador.y = Y_JOGADOR
 
-        # Atualizar tela
         pygame.display.flip()
-
-        # Controlar FPS
         clock.tick(FPS)
 
     pygame.quit()
