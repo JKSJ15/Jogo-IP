@@ -23,6 +23,7 @@ PRETO = (0, 0, 0)
 AZUL = (50, 120, 255)
 VERMELHO = (220, 50, 50)
 AMARELO = (255, 255, 0)
+CINZA = (90, 90, 90)
 
 # JOGADOR
 COR_JOGADOR = (0, 255, 0)
@@ -43,6 +44,25 @@ PALAVRAS_FASE2 = [
 PALAVRAS_FASE3 = [
     "ESPERANCA", "AMIZADE", "LEALDADE", "CORAGEM", "SABEDORIA"
 ]
+
+# PALAVRAS PROIBIDAS (tiram 1 vida)
+PROIBIDAS_FASE1 = [
+    "X-BARRADO", "XOR", "NOR", "AND", "NAND"
+]
+
+PROIBIDAS_FASE2 = [
+    "BREAK", "NONE", "GLOBAL", "CONTINUE", "SETS"
+]
+
+PROIBIDAS_FASE3 = [
+    "NIVAN", "NIVAN", "NIVAN", "NIVAN", "NIVAN"
+]
+
+# Chance de uma palavra que cai ser proibida (0.3 = 30%)
+CHANCE_PROIBIDA = 0.3
+
+# VIDAS
+VIDAS_INICIAIS = 3
 
 # UTILITÁRIOS
 PASTA_IMAGENS = "assets/images"

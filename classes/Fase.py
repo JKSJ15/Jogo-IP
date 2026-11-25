@@ -1,6 +1,7 @@
 import pygame
 import random
 from uteis.colisao import checar_colisao
+from uteis.coracao import desenhar_coracao
 from classes.Letras import Letra
 from classes.Cenario import Cenario
 from classes.Professor import Professor
@@ -8,13 +9,21 @@ from constantes import (
     VEL_LETRA,
     PALAVRAS_FASE1,
     PALAVRAS_FASE2,
-    PALAVRAS_FASE3
+    PALAVRAS_FASE3,
+    PROIBIDAS_FASE1,
+    PROIBIDAS_FASE2,
+    PROIBIDAS_FASE3,
+    CHANCE_PROIBIDA,
+    VIDAS_INICIAIS,
+    VERMELHO,
+    CINZA
 )
 
 class Fase:
     def __init__(self, numero_fase):
         self.numero_fase = numero_fase
         self.frases_coletadas = 0
+        self.vidas = VIDAS_INICIAIS
         self.letras = []
         self.ultimo_spawn = 0
         self.intervalo_spawn = 1500
@@ -24,18 +33,21 @@ class Fase:
         if numero_fase == 1:
             self.meta_fase = 10
             self.palavras = PALAVRAS_FASE1
+            self.palavras_proibidas = PROIBIDAS_FASE1
             self.nome_sala = "Grad5"
             self.professor = Professor(480, 350, "MARCIO")
 
         elif numero_fase == 2:
             self.meta_fase = 20
             self.palavras = PALAVRAS_FASE2
+            self.palavras_proibidas = PROIBIDAS_FASE2
             self.nome_sala = "E2"
             self.professor = Professor(480, 350, "STEFAN")
 
         else:
             self.meta_fase = 30
             self.palavras = PALAVRAS_FASE3
+            self.palavras_proibidas = PROIBIDAS_FASE3
             self.nome_sala = "E1"
             self.professor = Professor(480, 350, "NAVIN")
 
@@ -54,6 +66,7 @@ class Fase:
         self.estado = "entrada"
         self.tempo_entrada = pygame.time.get_ticks()
         self.frases_coletadas = 0
+        self.vidas = VIDAS_INICIAIS
         self.letras = []
         self.dialogos = []
         self.indice_dialogo = 0
@@ -86,10 +99,30 @@ class Fase:
         texto = self.fonte.render(self.nome_sala, True, (255, 255, 255))
         tela.blit(texto, texto.get_rect(center=(tela.get_width() // 2, y + altura // 2)))
 
+    # desenha a barra do topo: contador de palavras + corações
+    def desenhar_hud(self, tela):
+        # fundo da barra
+        pygame.draw.rect(tela, (20, 20, 40), (0, 0, tela.get_width(), 50))
+
+        # contador de palavras coletadas
+        texto = f"Palavras: {self.frases_coletadas}/{self.meta_fase}"
+        self.desenhar_texto(tela, texto, self.fonte, 20, 15)
+
+        # corações: vermelho = vida que ainda tem, cinza = vida perdida
+        x_inicial = tela.get_width() - 40 * VIDAS_INICIAIS - 20
+        for i in range(VIDAS_INICIAIS):
+            if i < self.vidas:
+                cor = VERMELHO
+            else:
+                cor = CINZA
+            desenhar_coracao(tela, x_inicial + i * 40, 12, 28, cor)
+
     # inicia desafio
     def iniciar_desafio(self):
         self.estado = "desafio"
         self.letras = []
+        self.frases_coletadas = 0
+        self.vidas = VIDAS_INICIAIS
         self.ultimo_spawn = pygame.time.get_ticks()
 
     # inicio da fase
@@ -148,8 +181,13 @@ class Fase:
 
             # Gerar palavras aleatoriamente
             if tempo_atual - self.ultimo_spawn >= self.intervalo_spawn:
-                palavra = random.choice(self.palavras)
-                self.letras.append(Letra(VEL_LETRA, palavra))
+                if random.random() < CHANCE_PROIBIDA:
+                    palavra = random.choice(self.palavras_proibidas)
+                    proibida = True
+                else:
+                    palavra = random.choice(self.palavras)
+                    proibida = False
+                self.letras.append(Letra(VEL_LETRA, palavra, proibida))
                 self.ultimo_spawn = tempo_atual
 
             # Movimentação e coleta
@@ -158,12 +196,33 @@ class Fase:
                 letra.desenhar(tela)
 
                 if checar_colisao(jogador, letra):
-                    self.frases_coletadas += 1
                     self.letras.remove(letra)
-                    if self.frases_coletadas >= self.meta_fase:
-                        jogador.desenhar(tela)
-                        return True
 
+                    if letra.proibida:
+                        # pegou palavra proibida: perde 1 vida
+                        self.vidas -= 1
+                        if self.vidas <= 0:
+                            self.estado = "derrota"
+                    else:
+                        # pegou palavra permitida: conta ponto
+                        self.frases_coletadas += 1
+                        if self.frases_coletadas >= self.meta_fase:
+                            jogador.desenhar(tela)
+                            return True
+
+                # palavra chegou no chão sem ninguém pegar: some
+                elif letra.saiu_da_tela():
+                    self.letras.remove(letra)
+
+            self.desenhar_hud(tela)
+
+        # ESTADO 5: DERROTA (acabaram as vidas)
+        elif self.estado == "derrota":
+            self.desenhar_hud(tela)
+            self.desenhar_caixa(tela, "Você perdeu todas as vidas! Tentar de novo?")
+            if pressionou_e:
+                self.iniciar_desafio()
+                
         # Desenhar jogador por último
         jogador.desenhar(tela)
         return False
