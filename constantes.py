@@ -133,7 +133,14 @@ INTERNAL_W = WIDTH
 INTERNAL_H = HEIGHT
 
 # PROFESSORES
+
 DIALOGO_FASE1 = [
+    "Olá, boah tardih!",
+    "Hojê studaremos Verrilog e portas lóghicas",
+    "Pegue apenas as portas lóghicas, evite outras palavras",
+    "so, vamos coméçar, boa sorthi!"
+    ]
+DIALOGO_FASE2 = [
     "Olá, meu nome é Márcio, seja bem-vindo à sala Grad 5!",
     "Aqui é onde você iniciará sua jornada",
     "Você deve fazer um desafio para conseguir a aprovação e sair daqui",
@@ -141,18 +148,12 @@ DIALOGO_FASE1 = [
     "Caso pegue mais de 3 proibidos, reprovará e ficará para sempre aqui",
     "Bom desafio! Talvez não tão bom..."]
 
-DIALOGO_FASE2 = [
-    "Olá, boah tardih!",
-    "Hojê studaremos Verrilog e portas lógicas",
-    "Pegue apenas as portas lógicas, evite outras palavras",
-    "so vamos comelçar, boa sorthi!"
-    ]
 
 DIALOGO_FASE3 = [
-    "Olá tablito! Achou que seria fácil assim?",
-    "Para conseguir aprovação e conseguir sair daqui, terá q passar por mim", 
+    "Olá, Tablito! Achou que seria fácil assim?",
+    "Para conseguir aprovação e conseguir sair daqui, terá que passar por mim", 
     "O temido Nivan",
-    "lhe garanto que não será tão fácil assim...",
+    "te garanto que não será tão fácil assim...",
     "Enfrente chuvas de assuntos e evite distrações",
     "Bom desafio, aguardo sua reprovação!"
     ]
