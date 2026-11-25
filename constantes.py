@@ -30,6 +30,8 @@ COR_JOGADOR = (0, 255, 0)
 X_JOGADOR = 432
 Y_JOGADOR = 650
 VEL_JOGADOR = 10
+REINICIOS = 1
+VIDAS_INICIAIS = 3
 
 # LETRAS
 VEL_LETRA = 5
@@ -60,9 +62,6 @@ PROIBIDAS_FASE3 = [
 
 # Chance de uma palavra que cai ser proibida (0.3 = 30%)
 CHANCE_PROIBIDA = 0.3
-
-# VIDAS
-VIDAS_INICIAIS = 3
 
 # UTILITÁRIOS
 PASTA_IMAGENS = "assets/images"
