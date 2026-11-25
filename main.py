@@ -28,73 +28,6 @@ def main():
         Y_JOGADOR,
         VEL_JOGADOR
     )
-    
-    # Portas do menu
-    porta1 = Porta(100, 200, 100, 150)
-    porta2 = Porta(350, 200, 100, 150)
-    porta3 = Porta(600, 200, 100, 150)
-
-    # Fases
-    fase1 = Fase(1)
-    fase2 = Fase(2)
-    fase3 = Fase(3)
-
-    # variáveis de controle
-    fase_atual = fase1
-    rodando = True
-
-    # Loop principal
-    while rodando:
-        eventos = pygame.event.get()
-
-        # Verificar saída do jogo
-        for evento in eventos:
-            if evento.type == pygame.QUIT:
-                rodando = False
-
-        # Capturar teclas pressionadas
-        teclas = pygame.key.get_pressed()
-        if teclas[pygame.K_ESCAPE]:
-            rodando = False
-        tela.fill((30, 30, 30))
-
-        # EXECUÇÃO DA FASE
-        venceu = fase_atual.iniciar(tela, teclas, jogador, eventos)
-        import pygame
-from classes.Jogador import Jogador
-from classes.Porta import Porta
-from classes.Fase import Fase
-from uteis.colisao import checar_colisao
-from constantes import (
-    LARGURA_TELA,
-    ALTURA_TELA,
-    FPS,
-    VEL_JOGADOR,
-    X_JOGADOR,
-    Y_JOGADOR
-)
-
-def main():
-    # Inicializa e configura o pygame
-    pygame.init()
-    tela = pygame.display.set_mode(
-        (LARGURA_TELA, ALTURA_TELA)
-    )
-    pygame.display.set_caption("Vamos CinBora")
-    clock = pygame.time.Clock()
-
-    # Instanciando objetos do jogo
-    # Jogador
-    jogador = Jogador(
-        X_JOGADOR,
-        Y_JOGADOR,
-        VEL_JOGADOR
-    )
-    
-    # Portas do menu
-    porta1 = Porta(100, 200, 100, 150)
-    porta2 = Porta(350, 200, 100, 150)
-    porta3 = Porta(600, 200, 100, 150)
 
     # Fases
     fase1 = Fase(1)
@@ -136,6 +69,7 @@ def main():
 
                 jogador.x = X_JOGADOR
                 jogador.y = Y_JOGADOR
+                
         pygame.display.flip()
         clock.tick(FPS)
 

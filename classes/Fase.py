@@ -5,6 +5,8 @@ from uteis.coracao import desenhar_coracao
 from classes.Letras import Letra
 from classes.Cenario import Cenario
 from classes.Professor import Professor
+from classes.Porta import Porta
+from constantes import LARGURA_TELA, ALTURA_TELA
 from constantes import (
     VEL_LETRA,
     PALAVRAS_FASE1,
@@ -30,6 +32,12 @@ class Fase:
         self.ultimo_spawn = 0
         self.intervalo_spawn = 1500
         self.cenario = Cenario()
+        self.porta = Porta(
+            LARGURA_TELA - 100,
+            ALTURA_TELA - 150,
+            70,
+            100
+        )
 
         # Configuração de cada fase
         if numero_fase == 1:
@@ -129,6 +137,7 @@ class Fase:
 
     # inicio da fase
     def iniciar(self, tela, teclas, jogador, eventos):
+        avancar = False
         tela.fill((0, 0, 0))
 
         # Desenhar cenário
@@ -138,6 +147,7 @@ class Fase:
             self.cenario.desenharFase2(tela)
         elif self.numero_fase == 3:
             self.cenario.desenharFase3(tela)
+        self.porta.desenhar(tela)
 
         # Verificar se E ou Q foi pressionado
         pressionou_e = any(evento.type == pygame.KEYDOWN and evento.key == pygame.K_e for evento in eventos)
@@ -195,6 +205,9 @@ class Fase:
 
             # Movimentação e coleta
             for letra in self.letras[:]:
+                if self.estado != "desafio":
+                    continue
+
                 letra.mover()
                 letra.desenhar(tela)
 
@@ -210,14 +223,30 @@ class Fase:
                         # pegou palavra permitida: conta ponto
                         self.frases_coletadas += 1
                         if self.frases_coletadas >= self.meta_fase:
-                            jogador.desenhar(tela)
-                            return True
+                            self.estado = "concluida"
+                            self.letras = []
+                            self.ultimo_spawn = pygame.time.get_ticks()
 
                 # palavra chegou no chão sem ninguém pegar: some
                 elif letra.saiu_da_tela():
                     self.letras.remove(letra)
 
             self.desenhar_hud(tela)
+
+        # ESTADO 5: FASE CONCLUÍDA
+        elif self.estado == "concluida":
+            jogador.mover(teclas)
+            self.desenhar_hud(tela)
+            self.desenhar_texto(
+                tela,
+                "Fase concluída! Vá até a porta para continuar.",
+                self.fonte,
+                150,
+                70,
+                (0, 255, 0)
+            )
+            if checar_colisao(jogador, self.porta):
+                avancar = True
 
         # ESTADO 5: DERROTA (acabaram as vidas)
         elif self.estado == "derrota":
@@ -259,4 +288,4 @@ class Fase:
                 
         # Desenhar jogador por último
         jogador.desenhar(tela)
-        return False
+        return avancar
