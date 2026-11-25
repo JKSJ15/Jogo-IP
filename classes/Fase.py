@@ -16,7 +16,8 @@ from constantes import (
     CHANCE_PROIBIDA,
     VIDAS_INICIAIS,
     VERMELHO,
-    CINZA
+    CINZA,
+    REINICIOS
 )
 
 class Fase:
@@ -24,6 +25,7 @@ class Fase:
         self.numero_fase = numero_fase
         self.frases_coletadas = 0
         self.vidas = VIDAS_INICIAIS
+        self.reinicios = REINICIOS
         self.letras = []
         self.ultimo_spawn = 0
         self.intervalo_spawn = 1500
@@ -137,8 +139,9 @@ class Fase:
         elif self.numero_fase == 3:
             self.cenario.desenharFase3(tela)
 
-        # Verificar se E foi pressionado
+        # Verificar se E ou Q foi pressionado
         pressionou_e = any(evento.type == pygame.KEYDOWN and evento.key == pygame.K_e for evento in eventos)
+        pressionou_q = any(evento.type == pygame.KEYDOWN and evento.key == pygame.K_q for evento in eventos)
 
         # ESTADO 1: ENTRADA
         if self.estado == "entrada":
@@ -219,9 +222,40 @@ class Fase:
         # ESTADO 5: DERROTA (acabaram as vidas)
         elif self.estado == "derrota":
             self.desenhar_hud(tela)
-            self.desenhar_caixa(tela, "Você perdeu todas as vidas! Tentar de novo?")
+            self.desenhar_caixa(tela, "Você perdeu todas as vidas! (Q-sair, E-reiniciar)")
+
+            if pressionou_e:
+                if self.reinicios > 0:
+                    self.reinicios -= 1
+                    self.estado = "reiniciando"
+                else:
+                    self.estado = "morte"
+
+            elif pressionou_q:
+                self.frases_coletadas = 0
+                self.vidas = VIDAS_INICIAIS
+                self.indice_dialogo = 0
+                self.estado = "exploracao"
+        
+        # ESTADO 6: REINICIANDO (usou reinicio)
+        elif self.estado == "reiniciando":
+            self.desenhar_hud(tela)
+            self.desenhar_caixa(tela, f"Você possui {self.reinicios} reinícios restantes!")
+
             if pressionou_e:
                 self.iniciar_desafio()
+
+        # ESTADO 7: MORTE (sem mais reinícios)
+        elif self.estado == "morte":
+            self.desenhar_caixa(tela, "Você perdeu todas as vidas e reinícios! Jogo encerrado!")
+
+            if pressionou_e:
+                self.desenhar_caixa(tela, "Reprovação! Você ficará para sempre no CIn.")
+                self.estado = "exploracao"
+                self.frases_coletadas = 0
+                self.vidas = VIDAS_INICIAIS
+                self.reinicios = REINICIOS
+
                 
         # Desenhar jogador por último
         jogador.desenhar(tela)
