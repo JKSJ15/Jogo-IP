@@ -12,9 +12,9 @@ class Professor(pegarReacao):
 
     # diálogos do professor
     def dialogar(self):
-        if self.nome == "MARCIO":
+        if self.nome == "STEFAN":
             return DIALOGO_FASE1
-        elif self.nome == "STEFAN":
+        elif self.nome == "MARCIO":
             return DIALOGO_FASE2
         elif self.nome == "NAVIN":
             return DIALOGO_FASE3
