@@ -23,6 +23,7 @@ PRETO = (0, 0, 0)
 AZUL = (50, 120, 255)
 VERMELHO = (220, 50, 50)
 AMARELO = (255, 255, 0)
+CINZA = (90, 90, 90)
 
 # JOGADOR
 COR_JOGADOR = (0, 255, 0)
@@ -43,6 +44,25 @@ PALAVRAS_FASE2 = [
 PALAVRAS_FASE3 = [
     "ESPERANCA", "AMIZADE", "LEALDADE", "CORAGEM", "SABEDORIA"
 ]
+
+# PALAVRAS PROIBIDAS (tiram 1 vida)
+PROIBIDAS_FASE1 = [
+    "X-BARRADO", "XOR", "NOR", "AND", "NAND"
+]
+
+PROIBIDAS_FASE2 = [
+    "BREAK", "NONE", "GLOBAL", "CONTINUE", "SETS"
+]
+
+PROIBIDAS_FASE3 = [
+    "NIVAN", "NIVAN", "NIVAN", "NIVAN", "NIVAN"
+]
+
+# Chance de uma palavra que cai ser proibida (0.3 = 30%)
+CHANCE_PROIBIDA = 0.3
+
+# VIDAS
+VIDAS_INICIAIS = 3
 
 # UTILITÁRIOS
 PASTA_IMAGENS = "assets/images"
@@ -113,26 +133,6 @@ INTERNAL_W = WIDTH
 INTERNAL_H = HEIGHT
 
 # PROFESSORES
-DIALOGO_FASE1 = [
-    "Olá, meu nome é Márcio, seja bem-vindo à sala Grad 5!",
-    "Aqui é onde você iniciará sua jornada",
-    "Você deve fazer um desafio para conseguir a aprovação e sair daqui",
-    "Você deverá coletar os comandos permitidos e evitar os proibidos",
-    "Caso pegue mais de 3 proibidos, reprovará e ficará para sempre aqui",
-    "Bom desafio! Talvez não tão bom..."]
-
-DIALOGO_FASE2 = [
-    "Olá, boah tardih!",
-    "Hojê studaremos Verrilog e portas lógicas",
-    "Pegue apenas as portas lógicas, evite outras palavras",
-    "so vamos comelçar, boa sorthi!"
-    ]
-
-DIALOGO_FASE3 = [
-    "Olá tablito! Achou que seria fácil assim?",
-    "Para conseguir aprovação e conseguir sair daqui, terá q passar por mim", 
-    "O temido Nivan",
-    "lhe garanto que não será tão fácil assim...",
-    "Enfrente chuvas de assuntos e evite distrações",
-    "Bom desafio, aguardo sua reprovação!"
-    ]
+DIALOGO_FASE1 = ["Olá, como vai?", "Tem algo te esperando", "bom desafio!"]
+DIALOGO_FASE2 = ["Olá, como vai?", "Tem algo te esperando", "bom desafio!"]
+DIALOGO_FASE3 = ["Olá, como vai?", "Tem algo te esperando", "bom desafio!"]
