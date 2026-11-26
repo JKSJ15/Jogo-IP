@@ -44,15 +44,15 @@ class Fase:
             self.meta_fase = 10
             self.palavras = PALAVRAS_FASE1
             self.palavras_proibidas = PROIBIDAS_FASE1
-            self.nome_sala = "Grad5"
-            self.professor = Professor(480, 350, "MARCIO")
+            self.nome_sala = "E2"
+            self.professor = Professor(480, 350, "STEFAN")
 
         elif numero_fase == 2:
             self.meta_fase = 20
             self.palavras = PALAVRAS_FASE2
             self.palavras_proibidas = PROIBIDAS_FASE2
-            self.nome_sala = "E2"
-            self.professor = Professor(480, 350, "STEFAN")
+            self.nome_sala = "Grad5"
+            self.professor = Professor(480, 350, "MARCIO")
 
         else:
             self.meta_fase = 30
@@ -142,9 +142,9 @@ class Fase:
 
         # Desenhar cenário
         if self.numero_fase == 1:
-            self.cenario.desenharFase1(tela)
-        elif self.numero_fase == 2:
             self.cenario.desenharFase2(tela)
+        elif self.numero_fase == 2:
+            self.cenario.desenharFase1(tela)
         elif self.numero_fase == 3:
             self.cenario.desenharFase3(tela)
         self.porta.desenhar(tela)
