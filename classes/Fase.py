@@ -243,7 +243,7 @@ class Fase:
 
                 if checar_colisao(jogador, coracao):
                     self.coracoes.remove(coracao)
-                    # só ganha vida se tiver menos que o máximo
+                    # só ganha vida se tiver menos que o máximo (1 ou 2 vidas)
                     if self.vidas < VIDAS_MAXIMAS:
                         self.vidas += 1
                         self.texto_aviso = "+1 vida!"
@@ -264,7 +264,6 @@ class Fase:
         # ESTADO 5: FASE CONCLUÍDA
         elif self.estado == "concluida":
             jogador.mover(teclas)
-            self.desenhar_hud(tela)
             self.porta.desenhar(tela, True)
             self.desenhar_texto(
                 tela,
