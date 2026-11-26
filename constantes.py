@@ -76,7 +76,7 @@ FATOR_LENTIDAO = 0.5
 # UTILITÁRIOS
 PASTA_IMAGENS = "assets/images"
 
-# FASE 1
+# FASE 2 (Grad 5)
 TILE = 16
 COLS = 18
 ROWS = 18
@@ -113,7 +113,7 @@ PALETTE_FASE1 = {
     'door_dark': (96, 60, 28),
 }
 
-# FASE 2
+# FASE 1 (E2)
 C_BG_FRAME = (248, 249, 251)
 C_OUTLINE = (32, 36, 44)
 C_WHITE = (252, 253, 255)

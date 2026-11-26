@@ -1,318 +1,230 @@
 import pygame
-from constantes import (TILE, SCALE, COLS, ROWS, WIDTH, HEIGHT, PALETTE_FASE1)
+from constantes import (
+    NATIVE_W, NATIVE_H,
+    C_BG_FRAME, C_OUTLINE, C_WHITE,
+    C_WALL_LIGHT, C_WALL_MID, C_WALL_DARK,
+    C_BASEBOARD, C_FLOOR_TILE, C_FLOOR_GRID,
+    C_SHADOW, C_GLASS_BG, C_GLASS_SHADE,
+    C_GLASS_SHINE, C_METAL,
+    C_BLUE_LIGHT, C_BLUE_MID, C_BLUE_DARK, C_BLUE_DEEP
+)
 
-canvas = pygame.Surface((WIDTH, HEIGHT))
-DOOR_RECT = pygame.Rect(8, 146, 5, 36)
+canvas = pygame.Surface((NATIVE_W, NATIVE_H))
+DOOR_RECT = pygame.Rect(34, 24, 32, 40)
 
-def draw_floor():
-    # Desenha o piso quadriculado.
-    for r in range(2, ROWS):
-        for c in range(COLS):
-            color = (
-                PALETTE_FASE1['floor_light']
-                if (r + c) % 2 == 0
-                else PALETTE_FASE1['floor_dark']
-            )
-            pygame.draw.rect(
-                canvas, color,
-                (c * TILE, r * TILE, TILE, TILE)
-            )
-            pygame.draw.rect(
-                canvas, PALETTE_FASE1['floor_grid'],
-                (c * TILE, r * TILE, TILE, TILE), 1
-            )
+def draw_room_architecture(surf):
+    # Desenha piso quadriculado, paredes em perspectiva GBA e interfone.
+    surf.fill(C_BG_FRAME)
 
-def draw_glass_board(x, y, w, h):
-    # Desenha um quadro de vidro.
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['glass_frame'],
-        (x, y, w, h)
-    )
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['glass_bg'],
-        (x + 2, y + 2, w - 4, h - 4)
-    )
-    for i in range(h - 6):
-        pygame.draw.line(
-            canvas, PALETTE_FASE1['glass_glare'],
-            (x + 6 + i, y + h - 4 - i),
-            (x + 11 + i, y + h - 4 - i)
-        )
-        pygame.draw.line(
-            canvas, PALETTE_FASE1['glass_glare'],
-            (x + 24 + i, y + h - 4 - i),
-            (x + 27 + i, y + h - 4 - i)
-        )
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['pc_shade'],
-        (x + 1, y + h - 2, w - 2, 2)
-    )
-    pygame.draw.rect(
-        canvas, (200, 64, 64),
-        (x + 14, y + h - 3, 4, 2)
-    )
-    pygame.draw.rect(
-        canvas, (64, 104, 184),
-        (x + 20, y + h - 3, 4, 2)
-    )
-    pygame.draw.rect(
-        canvas, (120, 112, 104),
-        (x + 32, y + h - 4, 8, 3)
-    )
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['black'],
-        (x, y, w, h), 1
-    )
+    # Paredes e piso interno
+    room_rect = pygame.Rect(12, 10, 296, 222)
+    pygame.draw.rect(surf, C_WALL_LIGHT, room_rect)
 
-def draw_walls_and_front():
-    # Desenha paredes, quadros, TV e porta.
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['wall_top'],
-        (0, 0, COLS * TILE, 8)
-    )
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['wall_front'],
-        (0, 8, COLS * TILE, 26)
-    )
-    pygame.draw.line(
-        canvas, PALETTE_FASE1['black'],
-        (0, 33), (COLS * TILE, 33), 1
-    )
-    draw_glass_board(24, 10, 56, 20)
+    # Parede superior (y: 10..64)
+    pygame.draw.rect(surf, C_WALL_MID, (12, 10, 296, 6))
+    pygame.draw.line(surf, C_WALL_DARK, (20, 16), (300, 16))
+    pygame.draw.rect(surf, C_WALL_LIGHT, (20, 17, 280, 43))
+    # Rodapé escuro
+    pygame.draw.rect(surf, C_BASEBOARD, (20, 60, 280, 4))
+    pygame.draw.line(surf, C_OUTLINE, (20, 64), (300, 64))
 
-    # TV central
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['tv_frame'],
-        (108, 9, 64, 24)
+    # Paredes laterais (esquerda e direita)
+    pygame.draw.rect(surf, C_WALL_MID, (12, 10, 8, 222))
+    pygame.draw.rect(surf, C_WALL_MID, (300, 10, 8, 222))
+    pygame.draw.line(surf, C_WALL_DARK, (20, 16), (20, 232))
+    pygame.draw.line(surf, C_WALL_DARK, (300, 16), (300, 232))
+    pygame.draw.line(surf, C_WALL_DARK, (12, 10), (20, 16))
+    pygame.draw.line(surf, C_WALL_DARK, (308, 10), (300, 16))
+
+    # Piso quadriculado 16x16 (y: 65..232)
+    floor_rect = pygame.Rect(21, 65, 279, 167)
+    pygame.draw.rect(surf, C_FLOOR_TILE, floor_rect)
+    for gx in range(21, 300, 16):
+        pygame.draw.line(surf, C_FLOOR_GRID, (gx, 65), (gx, 231))
+    for gy in range(65, 232, 16):
+        pygame.draw.line(surf, C_FLOOR_GRID, (21, gy), (299, gy))
+
+    # Interfone / controle na parede lateral esquerda
+    pygame.draw.rect(surf, C_OUTLINE, (15, 31, 9, 20))
+    pygame.draw.rect(surf, C_WHITE, (16, 32, 5, 18))
+    pygame.draw.rect(surf, C_WALL_DARK, (21, 32, 2, 18))
+    pygame.draw.rect(surf, C_BASEBOARD, (17, 36, 3, 5))
+
+
+def draw_full_glass_door(surf, x=34, y=24):
+    # Porta moderna toda de vidro com ferragens metálicas minimalistas.
+    w, h = 32, 40
+    # Sombra interna na parede
+    pygame.draw.rect(surf, C_WALL_DARK, (x - 1, y - 1, w + 2, h + 1))
+    # Folha inteiriça de vidro temperado
+    pygame.draw.rect(surf, C_OUTLINE, (x, y, w, h), 1)
+    pygame.draw.rect(surf, C_GLASS_BG, (x + 1, y + 1, w - 2, h - 2))
+
+    # Reflexos diagonais no vidro
+    pygame.draw.polygon(
+        surf,
+        C_GLASS_SHINE,
+        [(x + 4, y + 3), (x + 12, y + 3), (x + 3, y + 16), (x + 3, y + 9)],
     )
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['tv_screen'],
-        (111, 12, 58, 18)
+    pygame.draw.polygon(
+        surf,
+        C_GLASS_SHINE,
+        [(x + 16, y + 3), (x + 20, y + 3), (x + 3, y + 27), (x + 3, y + 22)],
     )
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['tv_frame'],
-        (126, 33, 28, 3)
+    # Faixa sutil de profundidade na base do vidro
+    pygame.draw.rect(surf, C_GLASS_SHADE, (x + 1, y + h - 5, w - 2, 4))
+
+    # Dobradiças minimalistas à esquerda e puxador vertical metálico à direita
+    pygame.draw.rect(surf, C_OUTLINE, (x, y + 5, 3, 4))
+    pygame.draw.rect(surf, C_METAL, (x + 1, y + 6, 2, 2))
+    pygame.draw.rect(surf, C_OUTLINE, (x, y + h - 9, 3, 4))
+    pygame.draw.rect(surf, C_METAL, (x + 1, y + h - 8, 2, 2))
+
+    pygame.draw.rect(surf, C_OUTLINE, (x + w - 6, y + 15, 3, 12))
+    pygame.draw.rect(surf, C_WHITE, (x + w - 5, y + 16, 1, 10))
+
+
+def draw_whiteboard(surf, x=110, y=15):
+    # Lousa branca interativa na parede superior central.
+    w, h = 100, 44
+    pygame.draw.rect(surf, C_OUTLINE, (x, y, w, h))
+    pygame.draw.rect(surf, C_WALL_DARK, (x + 1, y + 1, w - 2, h - 2))
+    pygame.draw.rect(surf, C_WHITE, (x + 3, y + 3, w - 6, h - 8))
+
+    # Esquemas/gráficos sutis desenhados na lousa
+    pygame.draw.rect(surf, C_WALL_MID, (x + 31, y + 16, 14, 12), 1)
+    pygame.draw.lines(
+        surf, C_WALL_MID, False, [(x + 34, y + 24), (x + 37, y + 20), (x + 40, y + 23), (x + 42, y + 19)], 1
     )
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['black'],
-        (126, 33, 28, 3), 1
+    pygame.draw.lines(
+        surf,
+        C_WALL_MID,
+        False,
+        [(x + 76, y + 17), (x + 76, y + 27), (x + 89, y + 27)],
+        1,
     )
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['black'],
-        (108, 9, 64, 24), 1
-    )
-    draw_glass_board(198, 10, 56, 20)
-    # Bordas laterais
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['wall_trim'],
-        (0, 0, 8, ROWS * TILE)
-    )
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['wall_trim'],
-        (COLS * TILE - 8, 0, 8, ROWS * TILE)
-    )
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['black'],
-        (0, 0, COLS * TILE, ROWS * TILE), 1
-    )
-    # Porta lateral
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['door_wood'],
-        (8, 146, 5, 36)
-    )
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['door_dark'],
-        (11, 146, 2, 36)
-    )
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['black'],
-        (8, 146, 5, 36), 1
-    )
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['pc_body'],
-        (12, 163, 2, 2)
+    pygame.draw.lines(
+        surf,
+        C_WALL_MID,
+        False,
+        [(x + 77, y + 25), (x + 80, y + 21), (x + 83, y + 24), (x + 87, y + 19)],
+        1,
     )
 
-def draw_totem_back(x, y):
-    # Desenha o totem visto de costas.
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['desk_shadow'],
-        (x + 1, y + 32, 22, 3)
-    )
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['totem_body'],
-        (x, y + 4, 24, 28)
-    )
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['totem_top'],
-        (x + 2, y, 20, 6)
-    )
-    pygame.draw.line(
-        canvas, PALETTE_FASE1['totem_shade'],
-        (x + 1, y + 6), (x + 1, y + 30), 2
-    )
-    pygame.draw.line(
-        canvas, PALETTE_FASE1['totem_shade'],
-        (x + 22, y + 6), (x + 22, y + 30), 2
-    )
-    pygame.draw.line(
-        canvas, PALETTE_FASE1['totem_shade'],
-        (x + 1, y + 30), (x + 22, y + 30), 2
-    )
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['black'],
-        (x, y + 2, 24, 30), 1
-    )
-    pygame.draw.line(
-        canvas, PALETTE_FASE1['black'],
-        (x + 2, y), (x + 21, y), 1
-    )
+    # Bandeja inferior com apagador e pincéis
+    pygame.draw.rect(surf, C_BASEBOARD, (x + 1, y + h - 4, w - 2, 3))
+    pygame.draw.rect(surf, C_OUTLINE, (x + 58, y + h - 6, 10, 3))
+    pygame.draw.rect(surf, C_BLUE_MID, (x + 42, y + h - 5, 4, 2))
+    pygame.draw.rect(surf, (214, 110, 110), (x + 36, y + h - 5, 4, 2))
 
-def draw_workstation(x, y):
-    # Desenha computador, teclado, mouse e cadeira.
-    # Monitor
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['pc_body'],
-        (x + 3, y - 5, 14, 11)
-    )
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['pc_shade'],
-        (x + 4, y + 4, 12, 2)
-    )
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['screen_dark'],
-        (x + 5, y - 3, 10, 6)
-    )
-    pygame.draw.line(
-        canvas, PALETTE_FASE1['screen_glare'],
-        (x + 6, y - 2), (x + 10, y - 2), 1
-    )
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['black'],
-        (x + 3, y - 5, 14, 11), 1
-    )
 
-    # Teclado
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['pc_body'],
-        (x + 2, y + 8, 16, 5)
-    )
-    pygame.draw.line(
-        canvas, PALETTE_FASE1['pc_shade'],
-        (x + 4, y + 10), (x + 15, y + 10), 1
-    )
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['black'],
-        (x + 2, y + 8, 16, 5), 1
-    )
-    # Mouse
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['pc_body'],
-        (x + 20, y + 9, 3, 4)
-    )
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['black'],
-        (x + 20, y + 9, 3, 4), 1
-    )
+def draw_teacher_station(surf):
+    # Mesa branca inclinada do professor e cadeira giratória azul (canto superior direito).
+    # --- Mesa do professor (perspectiva 2.5D) ---
+    desk_top = [(228, 52), (252, 52), (264, 74), (240, 74)]
+    desk_front = [(240, 74), (264, 74), (264, 92), (240, 92)]
+    desk_side = [(228, 52), (240, 74), (240, 92), (228, 69)]
 
-    # Cadeira
-    cx, cy = x + 5, y + 19
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['desk_shadow'],
-        (cx + 1, cy + 8, 8, 2)
-    )
-    pygame.draw.line(
-        canvas, PALETTE_FASE1['black'],
-        (cx + 2, cy + 7), (cx + 2, cy + 9), 1
-    )
-    pygame.draw.line(
-        canvas, PALETTE_FASE1['black'],
-        (cx + 7, cy + 7), (cx + 7, cy + 9), 1
-    )
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['chair_red'],
-        (cx, cy, 10, 7)
-    )
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['chair_dark'],
-        (cx + 1, cy + 5, 8, 2)
-    )
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['black'],
-        (cx, cy, 10, 7), 1
-    )
+    pygame.draw.polygon(surf, C_SHADOW, [(230, 89), (266, 89), (266, 94), (230, 94)])
+    pygame.draw.polygon(surf, C_WALL_MID, desk_side)
+    pygame.draw.polygon(surf, C_OUTLINE, desk_side, 1)
+    pygame.draw.polygon(surf, C_WALL_DARK, desk_front)
+    pygame.draw.polygon(surf, C_OUTLINE, desk_front, 1)
+    pygame.draw.polygon(surf, C_WHITE, desk_top)
+    pygame.draw.polygon(surf, C_OUTLINE, desk_top, 1)
 
-def draw_desk_row(x, y, num_pcs, spacing=30, total_width=None):
-    # Desenha uma bancada com computadores.
-    width = total_width if total_width else (
-        num_pcs * spacing + 4
-    )
-    height = 15
-    # Pernas
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['desk_leg'],
-        (x + 1, y + height, 4, 4)
-    )
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['black'],
-        (x + 1, y + height, 4, 4), 1
-    )
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['desk_leg'],
-        (x + width - 5, y + height, 4, 4)
-    )
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['black'],
-        (x + width - 5, y + height, 4, 4), 1
-    )
+    # --- Cadeira giratória azul do professor ---
+    cx, cy = 268, 42
+    # Base giratória com rodízios
+    pygame.draw.line(surf, C_OUTLINE, (cx + 12, cy + 25), (cx + 5, cy + 32), 2)
+    pygame.draw.line(surf, C_OUTLINE, (cx + 12, cy + 25), (cx + 19, cy + 32), 2)
+    pygame.draw.line(surf, C_OUTLINE, (cx + 12, cy + 25), (cx + 12, cy + 33), 2)
+    pygame.draw.rect(surf, C_METAL, (cx + 10, cy + 25, 4, 4))
 
-    # Tampo
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['desk_top'],
-        (x, y, width, height - 3)
-    )
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['desk_edge'],
-        (x, y + height - 3, width, 3)
-    )
-    pygame.draw.rect(
-        canvas, PALETTE_FASE1['black'],
-        (x, y, width, height), 1
-    )
-    # Computadores
-    for i in range(num_pcs):
-        draw_workstation(
-            x + 4 + i * spacing,
-            y + 1
-        )
+    # Assento estofado azul
+    pygame.draw.rect(surf, C_OUTLINE, (cx + 3, cy + 16, 18, 9), border_radius=3)
+    pygame.draw.rect(surf, C_BLUE_MID, (cx + 4, cy + 17, 16, 6), border_radius=2)
+    pygame.draw.rect(surf, C_BLUE_LIGHT, (cx + 6, cy + 17, 12, 2))
+
+    # Encosto ergonômico azul
+    pygame.draw.rect(surf, C_OUTLINE, (cx + 7, cy + 1, 14, 16), border_radius=3)
+    pygame.draw.rect(surf, C_BLUE_MID, (cx + 8, cy + 2, 12, 13), border_radius=2)
+    pygame.draw.rect(surf, C_BLUE_LIGHT, (cx + 9, cy + 3, 9, 4))
+
+    # Apoios de braço
+    pygame.draw.rect(surf, C_OUTLINE, (cx + 1, cy + 12, 6, 4))
+    pygame.draw.rect(surf, C_BLUE_DARK, (cx + 2, cy + 13, 4, 2))
+    pygame.draw.rect(surf, C_OUTLINE, (cx + 18, cy + 13, 6, 4))
+    pygame.draw.rect(surf, C_BLUE_DARK, (cx + 19, cy + 14, 4, 2))
+
+
+def draw_center_table(surf, x=112, y=96):
+    # Mesa retangular central da 1ª fileira.
+    w, h = 64, 26
+    pygame.draw.rect(surf, C_SHADOW, (x + 2, y + h - 2, w - 4, 4))
+    # Pernas frontais
+    pygame.draw.rect(surf, C_OUTLINE, (x + 2, y + 18, 4, 9))
+    pygame.draw.rect(surf, C_WALL_DARK, (x + 3, y + 19, 2, 7))
+    pygame.draw.rect(surf, C_OUTLINE, (x + w - 6, y + 18, 4, 9))
+    pygame.draw.rect(surf, C_WALL_DARK, (x + w - 5, y + 19, 2, 7))
+    # Tampo branco e frente cinza
+    pygame.draw.rect(surf, C_OUTLINE, (x, y, w, 20))
+    pygame.draw.rect(surf, C_WHITE, (x + 1, y + 1, w - 2, 14))
+    pygame.draw.rect(surf, C_WALL_MID, (x + 1, y + 15, w - 2, 4))
+
+
+def draw_student_chair(surf, x, y):
+    """
+    Cadeira universitária estilo FireRed com almofada azul, encosto curvo inferior
+    e prancheta branca acoplada no canto superior direito.
+    """
+    # Sombra no chão e pé central
+    pygame.draw.ellipse(surf, C_SHADOW, (x + 2, y + 23, 20, 6))
+    pygame.draw.rect(surf, C_OUTLINE, (x + 10, y + 25, 4, 4))
+
+    # Prancheta branca superior direita + haste lateral
+    pygame.draw.rect(surf, C_OUTLINE, (x + 11, y, 13, 12), border_radius=2)
+    pygame.draw.rect(surf, C_WHITE, (x + 12, y + 1, 11, 8))
+    pygame.draw.rect(surf, C_WALL_MID, (x + 12, y + 9, 11, 2))
+    pygame.draw.rect(surf, C_OUTLINE, (x + 20, y + 11, 4, 11))
+    pygame.draw.rect(surf, C_WALL_MID, (x + 21, y + 11, 2, 10))
+
+    # Apoio de braço esquerdo curto
+    pygame.draw.rect(surf, C_OUTLINE, (x, y + 11, 4, 9), border_radius=1)
+    pygame.draw.rect(surf, C_BLUE_DARK, (x + 1, y + 12, 2, 6))
+
+    # Almofada arredondada azul do assento
+    pygame.draw.rect(surf, C_OUTLINE, (x + 2, y + 9, 19, 13), border_radius=5)
+    pygame.draw.rect(surf, C_BLUE_MID, (x + 3, y + 10, 17, 10), border_radius=4)
+    pygame.draw.ellipse(surf, C_BLUE_LIGHT, (x + 5, y + 11, 13, 5))
+
+    # Encosto curvo azul-escuro envolvendo a base
+    pygame.draw.rect(surf, C_OUTLINE, (x + 1, y + 17, 21, 9), border_radius=4)
+    pygame.draw.rect(surf, C_BLUE_DARK, (x + 2, y + 18, 19, 6), border_radius=3)
+    pygame.draw.line(surf, C_BLUE_DEEP, (x + 3, y + 23), (x + 19, y + 23))
+
 
 def render_room():
-    """Renderiza toda a sala."""
-    draw_floor()
-    draw_walls_and_front()
-    draw_totem_back(246, 36)
+    draw_room_architecture(canvas)
 
-    # Lado esquerdo
-    draw_desk_row(
-        10, 56, num_pcs=3,
-        spacing=28, total_width=86
-    )
-    draw_desk_row(
-        10, 90, num_pcs=3,
-        spacing=28, total_width=86
-    )
-    draw_desk_row(
-        10, 202, num_pcs=2,
-        spacing=34, total_width=70
-    )
-    draw_desk_row(
-        10, 238, num_pcs=2,
-        spacing=34, total_width=70
-    )
-    # Lado direito
-    right_y_positions = [84, 122, 160, 198, 236]
-    for ry in right_y_positions:
-        draw_desk_row(
-            168, ry, num_pcs=3,
-            spacing=31, total_width=108
-        )
+    draw_full_glass_door(canvas, x=34, y=24)
+    draw_whiteboard(canvas, x=110, y=15)
+    draw_teacher_station(canvas)
+    draw_center_table(canvas, x=112, y=96)
+
+    cols_x = [32, 66, 100, 134, 168, 202, 236, 270]
+    rows_y = [92, 128, 162, 196]
+
+    chairs = []
+
+    chairs.append((cols_x[0], rows_y[0]))
+
+    for c in (5, 6, 7):
+        chairs.append((cols_x[c], rows_y[0]))
+
+    for r in (1, 2, 3):
+        for cx in cols_x:
+            chairs.append((cx, rows_y[r]))
+
+    for cx, cy in chairs:
+        draw_student_chair(canvas, cx, cy)
