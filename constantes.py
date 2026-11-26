@@ -63,6 +63,10 @@ PROIBIDAS_FASE3 = [
 # Chance de uma palavra que cai ser proibida (0.3 = 30%)
 CHANCE_PROIBIDA = 0.3
 
+# Chance de cair um coração (0.08 = 8%) e máximo de vidas
+CHANCE_CORACAO = 0.08
+VIDAS_MAXIMAS = 3
+
 # UTILITÁRIOS
 PASTA_IMAGENS = "assets/images"
 
