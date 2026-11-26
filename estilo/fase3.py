@@ -5,7 +5,7 @@ from constantes import NATIVE_W, NATIVE_H
 
 # Superfície interna de 320 x 240
 canvas = pygame.Surface((NATIVE_W, NATIVE_H))
-DOOR_RECT = pygame.Rect(294, 110, 5, 34)
+DOOR_RECT = pygame.Rect(315, 110, 5, 34)
 
 
 # PALETA DE CORES
@@ -39,9 +39,9 @@ C_PROJ_LENS     = (56, 64, 80)
 def draw_room(surf):
     surf.fill(C_BG_VOID)
 
-    room_x, room_y = 24, 10
-    room_w, room_h = 272, 220
-    wall_h = 38
+    room_x, room_y = 0, 0
+    room_w, room_h = NATIVE_W, NATIVE_H
+    wall_h = 48
     floor_y = room_y + wall_h
     floor_h = room_h - wall_h
 
@@ -117,7 +117,7 @@ def draw_room(surf):
     )
 
     # Porta
-    door_x = room_x + room_w - 2
+    door_x = room_x + room_w - 5
     door_y = floor_y + 62
 
     pygame.draw.rect(
