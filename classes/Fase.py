@@ -9,7 +9,9 @@ from classes.Cenario import Cenario
 from classes.Professor import Professor
 from classes.Porta import Porta
 from constantes import (
-    VEL_LETRA,
+    VEL_LETRA_FASE1,
+    VEL_LETRA_FASE2,
+    VEL_LETRA_FASE3,
     PALAVRAS_FASE1,
     PALAVRAS_FASE2,
     PALAVRAS_FASE3,
@@ -51,6 +53,7 @@ class Fase:
         # Configuração de cada fase
         if numero_fase == 1:
             self.meta_fase = 10
+            self.velocidade_letras = VEL_LETRA_FASE1
             self.palavras = PALAVRAS_FASE1
             self.palavras_proibidas = PROIBIDAS_FASE1
             self.nome_sala = "E2"
@@ -58,6 +61,7 @@ class Fase:
 
         elif numero_fase == 2:
             self.meta_fase = 20
+            self.velocidade_letras = VEL_LETRA_FASE2
             self.palavras = PALAVRAS_FASE2
             self.palavras_proibidas = PROIBIDAS_FASE2
             self.nome_sala = "Grad5"
@@ -65,6 +69,7 @@ class Fase:
 
         else:
             self.meta_fase = 30
+            self.velocidade_letras = VEL_LETRA_FASE3
             self.palavras = PALAVRAS_FASE3
             self.palavras_proibidas = PROIBIDAS_FASE3
             self.nome_sala = "E1"
@@ -212,15 +217,15 @@ class Fase:
             if tempo_atual - self.ultimo_spawn >= self.intervalo_spawn:
                 sorteio = random.random()
                 if sorteio < CHANCE_CORACAO:
-                    self.coracoes.append(ItemCoracao(VEL_LETRA))
+                    self.coracoes.append(ItemCoracao(self.velocidade_letras))
                 elif sorteio < CHANCE_CORACAO + CHANCE_SAPATO:
-                    self.sapatos.append(ItemSapato(VEL_LETRA))
+                    self.sapatos.append(ItemSapato(self.velocidade_letras))
                 elif sorteio < CHANCE_CORACAO + CHANCE_SAPATO + CHANCE_PROIBIDA:
                     palavra = random.choice(self.palavras_proibidas)
-                    self.letras.append(Letra(VEL_LETRA, palavra, True))
+                    self.letras.append(Letra(self.velocidade_letras, palavra, True))
                 else:
                     palavra = random.choice(self.palavras)
-                    self.letras.append(Letra(VEL_LETRA, palavra, False))
+                    self.letras.append(Letra(self.velocidade_letras, palavra, False))
                 self.ultimo_spawn = tempo_atual
 
             # Movimentação e coleta das palavras
