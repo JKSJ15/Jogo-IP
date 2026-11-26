@@ -1,7 +1,7 @@
 import pygame
 import random
 from uteis.colisao import checar_colisao
-from uteis.coracao import desenhar_coracao
+from estilo.coracao import desenhar_coracao
 from classes.Letras import Letra
 from classes.ItemCoracao import ItemCoracao
 from classes.Cenario import Cenario

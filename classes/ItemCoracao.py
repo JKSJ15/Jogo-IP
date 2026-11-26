@@ -2,7 +2,7 @@ import pygame
 import random
 import math
 from constantes import LARGURA_TELA, ALTURA_TELA, VERMELHO
-from uteis.coracao import desenhar_coracao
+from estilo.coracao import desenhar_coracao
 from uteis.pegarReacao import pegarReacao
 
 class ItemCoracao(pegarReacao):

@@ -1,16 +1,16 @@
 import pygame
 
-from cenarios.fase1 import (
+from estilo.fase1 import (
     canvas as canvas_fase1,
     render_room as render_room_fase1,
     DOOR_RECT as DOOR_FASE1,
 )
-from cenarios.fase2 import (
+from estilo.fase2 import (
     canvas as canvas_fase2,
     render_room as render_room_fase2,
     DOOR_RECT as DOOR_FASE2,
 )
-from cenarios.fase3 import (
+from estilo.fase3 import (
     canvas as canvas_fase3,
     render_room as render_room_fase3,
     DOOR_RECT as DOOR_FASE3,
