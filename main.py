@@ -2,6 +2,7 @@ import pygame
 from classes.Jogador import Jogador
 from classes.Porta import Porta
 from classes.Fase import Fase
+from classes.TelaFinal import TelaFinal
 from uteis.colisao import checar_colisao
 from constantes import (
     LARGURA_TELA,
@@ -37,6 +38,8 @@ def main():
     # variáveis de controle
     fase_atual = fase1
     rodando = True
+    estado_jogo = "jogando"
+    tela_final = TelaFinal("vitoria")
 
     # Loop principal
     while rodando:
@@ -54,21 +57,49 @@ def main():
         tela.fill((30, 30, 30))
 
         # EXECUÇÃO DA FASE
-        venceu = fase_atual.iniciar(tela, teclas, jogador, eventos)
-        if venceu:
-            if fase_atual.numero_fase == 3:
-                print("Você venceu!")
-                rodando = False
-            else:
-                if fase_atual.numero_fase == 1:
-                    fase_atual = fase2
-                elif fase_atual.numero_fase == 2:
-                    fase_atual = fase3
+        if estado_jogo == "jogando":
+            venceu = fase_atual.iniciar(tela, teclas, jogador, eventos)
 
-                fase_atual.reiniciar()
+            if venceu:
+                if fase_atual.numero_fase == 3:
+                    # passou pela última fase: tela de vitória
+                    estado_jogo = "fim"
+                    tela_final = TelaFinal("vitoria", "Você passou pelas 3 fases!")
+                else:
+                    if fase_atual.numero_fase == 1:
+                        fase_atual = fase2
+                    elif fase_atual.numero_fase == 2:
+                        fase_atual = fase3
 
+                    fase_atual.reiniciar()
+
+                    jogador.x = X_JOGADOR
+                    jogador.y = Y_JOGADOR
+
+            elif fase_atual.estado == "morte":
+                # sem vidas e sem reinícios: tela de derrota
+                estado_jogo = "fim"
+                tela_final = TelaFinal(
+                    "derrota",
+                    f"Você não passou da fase {fase_atual.numero_fase} - sala {fase_atual.nome_sala}"
+                )
+
+        # TELA FINAL (vitória ou derrota)
+        else:
+            acao = tela_final.atualizar(tela, eventos)
+
+            if acao == "reiniciar":
+                # começa tudo do zero
+                fase1 = Fase(1)
+                fase2 = Fase(2)
+                fase3 = Fase(3)
+                fase_atual = fase1
                 jogador.x = X_JOGADOR
                 jogador.y = Y_JOGADOR
+                estado_jogo = "jogando"
+
+            elif acao == "sair":
+                rodando = False
                 
         pygame.display.flip()
         clock.tick(FPS)
