@@ -135,13 +135,13 @@ INTERNAL_H = HEIGHT
 
 DIALOGO_FASE1 = [
     "Olá, boah tardih!",
+    "Aqui é onde você iniciará sua jornada",
     "Hojê studaremos Verrilog e portas lóghicas",
     "Pegue apenas as portas lóghicas, evite outras palavras",
     "so, vamos coméçar, boa sorthi!"
     ]
 DIALOGO_FASE2 = [
     "Olá, meu nome é Márcio, seja bem-vindo à sala Grad 5!",
-    "Aqui é onde você iniciará sua jornada",
     "Você deve fazer um desafio para conseguir a aprovação e sair daqui",
     "Você deverá coletar os comandos permitidos e evitar os proibidos",
     "Caso pegue mais de 3 proibidos, reprovará e ficará para sempre aqui",
