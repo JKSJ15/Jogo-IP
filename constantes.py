@@ -35,6 +35,7 @@ VIDAS_INICIAIS = 3
 
 # LETRAS
 VEL_LETRA = 5
+INTERVALO_SPAWS = 500
 PALAVRAS_FASE1 = [
     "ABRACAO", "AMOR", "PAZ", "FELICIDADE", "SAUDE"
 ]
@@ -66,6 +67,11 @@ CHANCE_PROIBIDA = 0.3
 # Chance de cair um coração (0.08 = 8%) e máximo de vidas
 CHANCE_CORACAO = 0.08
 VIDAS_MAXIMAS = 3
+
+# Chance de cair um coração (0.08 = 8%) e duração da lentidão (4 segundos)
+CHANCE_SAPATO = 0.08
+DURACAO_LENTIDAO = 4000
+FATOR_LENTIDAO = 0.5
 
 # UTILITÁRIOS
 PASTA_IMAGENS = "assets/images"

@@ -4,6 +4,7 @@ from uteis.colisao import checar_colisao
 from estilo.coracao import desenhar_coracao
 from classes.Letras import Letra
 from classes.ItemCoracao import ItemCoracao
+from classes.ItemSapato import ItemSapato
 from classes.Cenario import Cenario
 from classes.Professor import Professor
 from classes.Porta import Porta
@@ -17,11 +18,16 @@ from constantes import (
     PROIBIDAS_FASE3,
     CHANCE_PROIBIDA,
     CHANCE_CORACAO,
+    CHANCE_SAPATO,
+    DURACAO_LENTIDAO,
+    FATOR_LENTIDAO,
     VIDAS_MAXIMAS,
     VIDAS_INICIAIS,
     VERMELHO,
     CINZA,
-    REINICIOS
+    REINICIOS,
+    INTERVALO_SPAWS,
+    VEL_JOGADOR
 )
 
 class Fase:
@@ -32,10 +38,13 @@ class Fase:
         self.reinicios = REINICIOS
         self.letras = []
         self.coracoes = []
+        self.sapatos = []
+        self.fim_lentidao = 0
+        self.velocidade_original = VEL_JOGADOR
         self.texto_aviso = ""
         self.tempo_aviso = 0
         self.ultimo_spawn = 0
-        self.intervalo_spawn = 1500
+        self.intervalo_spawn = INTERVALO_SPAWS
         self.cenario = Cenario()
         self.porta = Porta()
 
@@ -79,6 +88,7 @@ class Fase:
         self.vidas = VIDAS_INICIAIS
         self.letras = []
         self.coracoes = []
+        self.sapatos = []
         self.texto_aviso = ""
         self.dialogos = []
         self.indice_dialogo = 0
@@ -134,6 +144,7 @@ class Fase:
         self.estado = "desafio"
         self.letras = []
         self.coracoes = []
+        self.sapatos = []
         self.texto_aviso = ""
         self.frases_coletadas = 0
         self.vidas = VIDAS_INICIAIS
@@ -143,6 +154,12 @@ class Fase:
     def iniciar(self, tela, teclas, jogador, eventos):
         avancar = False
         tela.fill((0, 0, 0))
+
+        # se saiu do desafio (derrota, fase concluída...), a velocidade volta ao normal
+        if self.estado != "desafio" and self.velocidade_original is not None:
+            jogador.velocidade = self.velocidade_original
+            self.velocidade_original = None
+            self.sapatos = []
 
         # Desenhar cenário e atualizar a hitbox da porta
         self.cenario.desenhar(self.numero_fase, tela)
@@ -191,12 +208,14 @@ class Fase:
             jogador.mover(teclas)
             tempo_atual = pygame.time.get_ticks()
 
-            # Gerar palavras (ou coração) aleatoriamente
+            # Gerar palavras, coração ou sapato aleatoriamente
             if tempo_atual - self.ultimo_spawn >= self.intervalo_spawn:
                 sorteio = random.random()
                 if sorteio < CHANCE_CORACAO:
                     self.coracoes.append(ItemCoracao(VEL_LETRA))
-                elif sorteio < CHANCE_CORACAO + CHANCE_PROIBIDA:
+                elif sorteio < CHANCE_CORACAO + CHANCE_SAPATO:
+                    self.sapatos.append(ItemSapato(VEL_LETRA))
+                elif sorteio < CHANCE_CORACAO + CHANCE_SAPATO + CHANCE_PROIBIDA:
                     palavra = random.choice(self.palavras_proibidas)
                     self.letras.append(Letra(VEL_LETRA, palavra, True))
                 else:
@@ -227,6 +246,7 @@ class Fase:
                             self.estado = "concluida"
                             self.letras = []
                             self.coracoes = []
+                            self.sapatos = []
                             self.ultimo_spawn = pygame.time.get_ticks()
 
                 # palavra chegou no chão sem ninguém pegar: some
@@ -254,6 +274,36 @@ class Fase:
                 # coração chegou no chão sem ninguém pegar: some
                 elif coracao.saiu_da_tela():
                     self.coracoes.remove(coracao)
+
+            # Movimentação e coleta dos sapatos (deixam o jogador lento)
+            for sapato in self.sapatos[:]:
+                if self.estado != "desafio":
+                    continue
+
+                sapato.mover()
+                sapato.desenhar(tela)
+
+                if checar_colisao(jogador, sapato):
+                    self.sapatos.remove(sapato)
+
+                    # guarda a velocidade normal só uma vez (para não acumular lentidão)
+                    if self.velocidade_original is None:
+                        self.velocidade_original = jogador.velocidade
+                        jogador.velocidade = jogador.velocidade * FATOR_LENTIDAO
+
+                    # pegar outro sapato renova o tempo
+                    self.fim_lentidao = tempo_atual + DURACAO_LENTIDAO
+                    self.texto_aviso = "Lento!"
+                    self.tempo_aviso = tempo_atual
+
+                # sapato chegou no chão sem ninguém pegar: some
+                elif sapato.saiu_da_tela():
+                    self.sapatos.remove(sapato)
+
+            # acabou o tempo da lentidão, volta ao normal
+            if self.velocidade_original is not None and tempo_atual >= self.fim_lentidao:
+                jogador.velocidade = self.velocidade_original
+                self.velocidade_original = None
 
             self.desenhar_hud(tela)
 
