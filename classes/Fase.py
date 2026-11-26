@@ -186,7 +186,7 @@ class Fase:
             jogador.mover(teclas)
             self.professor.desenhar(tela)
             if checar_colisao(jogador, self.professor):
-                self.desenhar_texto(tela, "Pressione E para conversar", self.fonte, 350, 550, (255, 255, 0))
+                self.desenhar_texto(tela, "Pressione E para conversar", self.fonte, 350, 550, (0, 0, 0))
                 if pressionou_e:
                     self.dialogos = self.professor.dialogar()
 
