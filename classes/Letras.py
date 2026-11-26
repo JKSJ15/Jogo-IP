@@ -1,17 +1,27 @@
 import pygame
 import random
-from constantes import LARGURA_TELA, ALTURA_TELA, VERMELHO
+from constantes import LARGURA_TELA, ALTURA_TELA, VERMELHO, BRANCO
 from uteis.pegarReacao import pegarReacao
 
 class Letra(pegarReacao):
     # inicialização da letra
     def __init__(self, velocidade, texto, proibida=False):
         super().__init__()
-        self.x = random.randint(0, LARGURA_TELA - 50)
-        self.y = -50
         self.velocidade = velocidade
         self.texto = texto
         self.proibida = proibida
+
+        # prepara o texto uma vez só 
+        self.fonte = pygame.font.Font(None, 36)
+        self.imagem_texto = self.fonte.render(self.texto, True, BRANCO)
+
+        # tamanho do quadrado de acordo com a palavra (10px de folga de cada lado)
+        self.largura = self.imagem_texto.get_width() + 20
+        self.altura = 50
+
+        # posição inicial: garante que a palavra inteira caiba na tela
+        self.x = random.randint(0, max(0, LARGURA_TELA - self.largura))
+        self.y = -self.altura
 
     # movimentação da letra
     def mover(self):
@@ -23,15 +33,13 @@ class Letra(pegarReacao):
 
     # desenhando a letra na tela
     def desenhar(self, tela):
-        pygame.draw.rect(tela, VERMELHO, (self.x, self.y, 50, 50))
+        pygame.draw.rect(tela, VERMELHO, (self.x, self.y, self.largura, self.altura))
 
-        fonte = pygame.font.Font(None, 36)
-        texto = fonte.render(self.texto, True, (255, 255, 255))
+        rect_texto = self.imagem_texto.get_rect(
+            center=(self.x + self.largura // 2, self.y + self.altura // 2)
+        )
+        tela.blit(self.imagem_texto, rect_texto)
 
-        rect_texto = texto.get_rect(center=(self.x + 25, self.y + 25))
-
-        tela.blit(texto, rect_texto)
-
-    # pegando a reação da letra
+    # pegando a reação da letra (área de colisão do tamanho do quadrado)
     def pegar_reacao(self):
-        return pygame.Rect(self.x, self.y, 50, 50)
+        return pygame.Rect(self.x, self.y, self.largura, self.altura)
