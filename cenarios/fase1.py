@@ -2,6 +2,7 @@ import pygame
 from constantes import (TILE, SCALE, COLS, ROWS, WIDTH, HEIGHT, PALETTE_FASE1)
 
 canvas = pygame.Surface((WIDTH, HEIGHT))
+DOOR_RECT = pygame.Rect(8, 146, 5, 36)
 
 def draw_floor():
     # Desenha o piso quadriculado.

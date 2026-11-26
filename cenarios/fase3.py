@@ -5,6 +5,7 @@ from constantes import NATIVE_W, NATIVE_H
 
 # Superfície interna de 320 x 240
 canvas = pygame.Surface((NATIVE_W, NATIVE_H))
+DOOR_RECT = pygame.Rect(294, 110, 5, 34)
 
 
 # PALETA DE CORES

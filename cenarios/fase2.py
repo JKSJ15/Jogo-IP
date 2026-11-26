@@ -10,6 +10,7 @@ from constantes import (
 )
 
 canvas = pygame.Surface((NATIVE_W, NATIVE_H))
+DOOR_RECT = pygame.Rect(34, 24, 32, 40)
 
 def draw_room_architecture(surf):
     # Desenha piso quadriculado, paredes em perspectiva GBA e interfone.

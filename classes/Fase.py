@@ -3,10 +3,10 @@ import random
 from uteis.colisao import checar_colisao
 from uteis.coracao import desenhar_coracao
 from classes.Letras import Letra
+from classes.ItemCoracao import ItemCoracao
 from classes.Cenario import Cenario
 from classes.Professor import Professor
 from classes.Porta import Porta
-from constantes import LARGURA_TELA, ALTURA_TELA
 from constantes import (
     VEL_LETRA,
     PALAVRAS_FASE1,
@@ -16,6 +16,8 @@ from constantes import (
     PROIBIDAS_FASE2,
     PROIBIDAS_FASE3,
     CHANCE_PROIBIDA,
+    CHANCE_CORACAO,
+    VIDAS_MAXIMAS,
     VIDAS_INICIAIS,
     VERMELHO,
     CINZA,
@@ -29,15 +31,13 @@ class Fase:
         self.vidas = VIDAS_INICIAIS
         self.reinicios = REINICIOS
         self.letras = []
+        self.coracoes = []
+        self.texto_aviso = ""
+        self.tempo_aviso = 0
         self.ultimo_spawn = 0
         self.intervalo_spawn = 1500
         self.cenario = Cenario()
-        self.porta = Porta(
-            LARGURA_TELA - 100,
-            ALTURA_TELA - 150,
-            70,
-            100
-        )
+        self.porta = Porta()
 
         # Configuração de cada fase
         if numero_fase == 1:
@@ -78,6 +78,8 @@ class Fase:
         self.frases_coletadas = 0
         self.vidas = VIDAS_INICIAIS
         self.letras = []
+        self.coracoes = []
+        self.texto_aviso = ""
         self.dialogos = []
         self.indice_dialogo = 0
         self.ultimo_spawn = pygame.time.get_ticks()
@@ -131,6 +133,8 @@ class Fase:
     def iniciar_desafio(self):
         self.estado = "desafio"
         self.letras = []
+        self.coracoes = []
+        self.texto_aviso = ""
         self.frases_coletadas = 0
         self.vidas = VIDAS_INICIAIS
         self.ultimo_spawn = pygame.time.get_ticks()
@@ -140,14 +144,9 @@ class Fase:
         avancar = False
         tela.fill((0, 0, 0))
 
-        # Desenhar cenário
-        if self.numero_fase == 1:
-            self.cenario.desenharFase2(tela)
-        elif self.numero_fase == 2:
-            self.cenario.desenharFase1(tela)
-        elif self.numero_fase == 3:
-            self.cenario.desenharFase3(tela)
-        self.porta.desenhar(tela)
+        # Desenhar cenário e atualizar a hitbox da porta
+        self.cenario.desenhar(self.numero_fase, tela)
+        self.porta.definir_area(self.cenario.porta_rect)
 
         # Verificar se E ou Q foi pressionado
         pressionou_e = any(evento.type == pygame.KEYDOWN and evento.key == pygame.K_e for evento in eventos)
@@ -192,18 +191,20 @@ class Fase:
             jogador.mover(teclas)
             tempo_atual = pygame.time.get_ticks()
 
-            # Gerar palavras aleatoriamente
+            # Gerar palavras (ou coração) aleatoriamente
             if tempo_atual - self.ultimo_spawn >= self.intervalo_spawn:
-                if random.random() < CHANCE_PROIBIDA:
+                sorteio = random.random()
+                if sorteio < CHANCE_CORACAO:
+                    self.coracoes.append(ItemCoracao(VEL_LETRA))
+                elif sorteio < CHANCE_CORACAO + CHANCE_PROIBIDA:
                     palavra = random.choice(self.palavras_proibidas)
-                    proibida = True
+                    self.letras.append(Letra(VEL_LETRA, palavra, True))
                 else:
                     palavra = random.choice(self.palavras)
-                    proibida = False
-                self.letras.append(Letra(VEL_LETRA, palavra, proibida))
+                    self.letras.append(Letra(VEL_LETRA, palavra, False))
                 self.ultimo_spawn = tempo_atual
 
-            # Movimentação e coleta
+            # Movimentação e coleta das palavras
             for letra in self.letras[:]:
                 if self.estado != "desafio":
                     continue
@@ -225,18 +226,46 @@ class Fase:
                         if self.frases_coletadas >= self.meta_fase:
                             self.estado = "concluida"
                             self.letras = []
+                            self.coracoes = []
                             self.ultimo_spawn = pygame.time.get_ticks()
 
                 # palavra chegou no chão sem ninguém pegar: some
                 elif letra.saiu_da_tela():
                     self.letras.remove(letra)
 
+            # Movimentação e coleta dos corações
+            for coracao in self.coracoes[:]:
+                if self.estado != "desafio":
+                    continue
+
+                coracao.mover()
+                coracao.desenhar(tela)
+
+                if checar_colisao(jogador, coracao):
+                    self.coracoes.remove(coracao)
+                    # só ganha vida se tiver menos que o máximo
+                    if self.vidas < VIDAS_MAXIMAS:
+                        self.vidas += 1
+                        self.texto_aviso = "+1 vida!"
+                    else:
+                        self.texto_aviso = "Vida cheia!"
+                    self.tempo_aviso = tempo_atual
+
+                # coração chegou no chão sem ninguém pegar: some
+                elif coracao.saiu_da_tela():
+                    self.coracoes.remove(coracao)
+
             self.desenhar_hud(tela)
+
+            # aviso embaixo dos corações do HUD por 1 segundo
+            if self.texto_aviso != "" and tempo_atual - self.tempo_aviso < 1000:
+                self.desenhar_texto(tela, self.texto_aviso, self.fonte, tela.get_width() - 160, 60, (255, 120, 120))
 
         # ESTADO 5: FASE CONCLUÍDA
         elif self.estado == "concluida":
             jogador.mover(teclas)
             self.desenhar_hud(tela)
+            self.porta.desenhar(tela, True)
             self.desenhar_texto(
                 tela,
                 "Fase concluída! Vá até a porta para continuar.",
@@ -265,7 +294,7 @@ class Fase:
                 self.vidas = VIDAS_INICIAIS
                 self.indice_dialogo = 0
                 self.estado = "exploracao"
-        
+
         # ESTADO 6: REINICIANDO (usou reinicio)
         elif self.estado == "reiniciando":
             self.desenhar_hud(tela)
@@ -285,7 +314,7 @@ class Fase:
                 self.vidas = VIDAS_INICIAIS
                 self.reinicios = REINICIOS
 
-                
+
         # Desenhar jogador por último
         jogador.desenhar(tela)
         return avancar
