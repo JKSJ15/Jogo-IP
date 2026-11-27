@@ -119,6 +119,17 @@ class Fase:
         imagem = fonte.render(texto, True, cor)
         tela.blit(imagem, (x, y))
 
+    # desenha texto com um retângulo de fundo atrás
+    def desenhar_texto_com_fundo(self, tela, texto, fonte, x, y, cor_texto=(255, 255, 255),
+                                 cor_fundo=(20, 20, 40), margem=10):
+        imagem = fonte.render(texto, True, cor_texto)
+        fundo = pygame.Rect(x - margem, y - margem,
+                            imagem.get_width() + margem * 2,
+                            imagem.get_height() + margem * 2)
+        pygame.draw.rect(tela, cor_fundo, fundo, border_radius=8)
+        pygame.draw.rect(tela, (255, 255, 255), fundo, 2, border_radius=8)
+        tela.blit(imagem, (x, y))
+
     # desenha caixa de texto
     def desenhar_caixa(self, tela, texto):
         largura = 700
@@ -217,7 +228,7 @@ class Fase:
             jogador.mover(teclas)
             self.professor.desenhar(tela)
             if checar_colisao(jogador, self.professor):
-                self.desenhar_texto(tela, "Pressione E para conversar", self.fonte, 350, 550, (0, 0, 0))
+                self.desenhar_texto_com_fundo(tela, "Pressione E para conversar", self.fonte, 350, 550, (255, 255, 0))
                 if pressionou_e:
                     self.dialogos = self.professor.dialogar()
 
@@ -397,7 +408,7 @@ class Fase:
         elif self.estado == "concluida":
             jogador.mover(teclas)
             self.porta.desenhar(tela, True)
-            self.desenhar_texto(
+            self.desenhar_texto_com_fundo(
                 tela,
                 "Fase concluída! Vá até a porta para continuar.",
                 self.fonte,
