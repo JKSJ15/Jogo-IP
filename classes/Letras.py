@@ -1,6 +1,6 @@
 import pygame
 import random
-from constantes import LARGURA_TELA, ALTURA_TELA, VERMELHO, BRANCO
+from constantes import LARGURA_TELA, ALTURA_TELA, VERMELHO, BRANCO, VERDE
 from uteis.pegarReacao import pegarReacao
 
 class Letra(pegarReacao):
@@ -33,13 +33,18 @@ class Letra(pegarReacao):
 
     # desenhando a letra na tela
     def desenhar(self, tela):
-        pygame.draw.rect(tela, VERMELHO, (self.x, self.y, self.largura, self.altura))
+        # proibida sera vermelho e permitida = verde
+        if self.proibida:
+            cor_fundo = VERMELHO
+        else:
+            cor_fundo = VERDE
+
+        pygame.draw.rect(tela, cor_fundo, (self.x, self.y, self.largura, self.altura))
 
         rect_texto = self.imagem_texto.get_rect(
             center=(self.x + self.largura // 2, self.y + self.altura // 2)
         )
         tela.blit(self.imagem_texto, rect_texto)
-
     # pegando a reação da letra (área de colisão do tamanho do quadrado)
     def pegar_reacao(self):
         return pygame.Rect(self.x, self.y, self.largura, self.altura)
