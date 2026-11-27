@@ -41,8 +41,18 @@ from constantes import (
 )
 
 class Fase:
-    def __init__(self, numero_fase):
+    def __init__(self, numero_fase, estatisticas=None):
         self.numero_fase = numero_fase
+
+        # Estatísticas acumuladas durante a partida
+        self.estatisticas = estatisticas if estatisticas is not None else {
+            "palavras_permitidas": 0,
+            "palavras_proibidas": 0,
+            "coracoes": 0,
+            "raios": 0,
+            "relogios": 0,
+            "sapatos": 0,
+        }
         self.frases_coletadas = 0
         self.vidas = VIDAS_INICIAIS
         self.reinicios = REINICIOS
@@ -311,11 +321,13 @@ class Fase:
 
                     if letra.proibida:
                         # pegou palavra proibida: perde 1 vida
+                        self.estatisticas["palavras_proibidas"] += 1
                         self.vidas -= 1
                         if self.vidas <= 0:
                             self.estado = "derrota"
                     else:
                         # pegou palavra permitida: conta ponto
+                        self.estatisticas["palavras_permitidas"] += 1
                         self.frases_coletadas += 1
                         if self.frases_coletadas >= self.meta_fase:
                             self.estado = "concluida"
@@ -340,6 +352,7 @@ class Fase:
 
                 if checar_colisao(jogador, coracao):
                     self.coracoes.remove(coracao)
+                    self.estatisticas["coracoes"] += 1
                     # só ganha vida se tiver menos que o máximo (1 ou 2 vidas)
                     if self.vidas < VIDAS_MAXIMAS:
                         self.vidas += 1
@@ -362,6 +375,7 @@ class Fase:
 
                 if checar_colisao(jogador, sapato):
                     self.sapatos.remove(sapato)
+                    self.estatisticas["sapatos"] += 1
 
                     # guarda a velocidade normal só uma vez (para não acumular lentidão)
                     if self.velocidade_original is None:
@@ -387,6 +401,7 @@ class Fase:
 
                 if checar_colisao(jogador, raio):
                     self.raios.remove(raio)
+                    self.estatisticas["raios"] += 1
 
                     self.fator_queda = FATOR_RAPIDEZ
                     self.fim_efeito_queda = tempo_atual + DURACAO_RAPIDEZ
@@ -407,6 +422,7 @@ class Fase:
 
                 if checar_colisao(jogador, relogio):
                     self.relogios.remove(relogio)
+                    self.estatisticas["relogios"] += 1
                     self.fator_queda = FATOR_RELOGIO
                     self.fim_efeito_queda = tempo_atual + DURACAO_RELOGIO
                     self.texto_aviso = "Letras lentas!"
