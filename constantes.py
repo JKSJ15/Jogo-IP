@@ -1,4 +1,4 @@
-# CONFIGURAÇÕES GERAIS
+# CONFIGURAÇÕES GERAIS ----------------------
 FPS = 60
 
 # RESOLUÇÃO DA JANELA
@@ -25,7 +25,7 @@ VERMELHO = (220, 50, 50)
 AMARELO = (255, 255, 0)
 CINZA = (90, 90, 90)
 
-# JOGADOR
+# JOGADOR ----------------------
 COR_JOGADOR = (0, 255, 0)
 X_JOGADOR = 432
 Y_JOGADOR = 650
@@ -33,20 +33,19 @@ VEL_JOGADOR = 10
 REINICIOS = 1
 VIDAS_INICIAIS = 3
 
-# LETRAS
-VEL_LETRA = 5
+# PALAVRAS ----------------------
 VEL_LETRA_FASE1 = 4
 VEL_LETRA_FASE2 = 6
 VEL_LETRA_FASE3 = 8
 INTERVALO_SPAWS = 500
+
+# PALAVRAS PERMITIDAS
 PALAVRAS_FASE1 = [
     "ABRACAO", "AMOR", "PAZ", "FELICIDADE", "SAUDE"
 ]
-
 PALAVRAS_FASE2 = [
     "LIBERDADE", "JUSTICA", "IGUALDADE", "PAZ", "FELICIDADE"
 ]
-
 PALAVRAS_FASE3 = [
     "ESPERANCA", "AMIZADE", "LEALDADE", "CORAGEM", "SABEDORIA"
 ]
@@ -55,31 +54,36 @@ PALAVRAS_FASE3 = [
 PROIBIDAS_FASE1 = [
     "X-BARRADO", "XOR", "NOR", "AND", "NAND"
 ]
-
 PROIBIDAS_FASE2 = [
     "BREAK", "NONE", "GLOBAL", "CONTINUE", "SETS"
 ]
-
 PROIBIDAS_FASE3 = [
     "NIVAN", "NIVAN", "NIVAN", "NIVAN", "NIVAN"
 ]
 
-# Chance de uma palavra que cai ser proibida (0.3 = 30%)
-CHANCE_PROIBIDA = 0.3
+CHANCE_PROIBIDA = 0.3  #30%
 
-# Chance de cair um coração (0.08 = 8%) e máximo de vidas
-CHANCE_CORACAO = 0.08
+# COLETÁVEIS ----------------------
+# CORAÇÕES
+CHANCE_CORACAO = 0.08 # 8%
 VIDAS_MAXIMAS = 3
 
-# Chance de cair um coração (0.08 = 8%) e duração da lentidão (4 segundos)
-CHANCE_SAPATO = 0.08
-DURACAO_LENTIDAO = 4000
-FATOR_LENTIDAO = 0.5
+# SAPATO
+CHANCE_SAPATO = 0.10  # 10%
+DURACAO_LENTIDAO = 4000  # 4 segundos
+FATOR_LENTIDAO = 0.5  # pela metade
 
-# UTILITÁRIOS
-PASTA_IMAGENS = "assets/images"
+# RAIO
+CHANCE_RAIO = 0.15  # 15%
+DURACAO_RAPIDEZ = 4000  # 4 segundos
+FATOR_RAPIDEZ = 1.8   # 80% mais rápidas
+    
+# RELÓGIO
+CHANCE_RELOGIO = 0.05  # 5%
+DURACAO_RELOGIO = 4000  # 4 segundos
+FATOR_RELOGIO = 0.5    # pela metade
 
-# FASE 2 (Grad 5)
+# FASE 2 (Grad 5) ----------------------
 TILE = 16
 COLS = 18
 ROWS = 18
@@ -116,7 +120,7 @@ PALETTE_FASE1 = {
     'door_dark': (96, 60, 28),
 }
 
-# FASE 1 (E2)
+# FASE 1 (E2) ----------------------
 C_BG_FRAME = (248, 249, 251)
 C_OUTLINE = (32, 36, 44)
 C_WHITE = (252, 253, 255)
@@ -140,12 +144,11 @@ C_BLUE_MID = (64, 134, 222)
 C_BLUE_DARK = (36, 84, 158)
 C_BLUE_DEEP = (24, 56, 112)
 
-# RESOLUÇÃO FASE 3
+# FASE 3 ----------------------
 INTERNAL_W = WIDTH
 INTERNAL_H = HEIGHT
 
-# PROFESSORES
-
+# PROFESSORES ----------------------
 DIALOGO_FASE1 = [
     "Olá, boah tardih!",
     "Aqui é onde você iniciará sua jornada",
@@ -159,8 +162,6 @@ DIALOGO_FASE2 = [
     "Você deverá coletar os comandos permitidos e evitar os proibidos",
     "Caso pegue mais de 3 proibidos, reprovará e ficará para sempre aqui",
     "Bom desafio! Talvez não tão bom..."]
-
-
 DIALOGO_FASE3 = [
     "Olá, Tablito! Achou que seria fácil assim?",
     "Para conseguir aprovação e conseguir sair daqui, terá que passar por mim", 

@@ -3,8 +3,10 @@ import random
 from uteis.colisao import checar_colisao
 from estilo.coracao import desenhar_coracao
 from classes.Letras import Letra
-from classes.ItemCoracao import ItemCoracao
-from classes.ItemSapato import ItemSapato
+from itens.ItemCoracao import ItemCoracao
+from itens.ItemSapato import ItemSapato
+from itens.ItemRaio import ItemRaio
+from itens.ItemRelogio import ItemRelogio
 from classes.Cenario import Cenario
 from classes.Professor import Professor
 from classes.Porta import Porta
@@ -21,8 +23,14 @@ from constantes import (
     CHANCE_PROIBIDA,
     CHANCE_CORACAO,
     CHANCE_SAPATO,
+    CHANCE_RAIO,
+    CHANCE_RELOGIO,
     DURACAO_LENTIDAO,
     FATOR_LENTIDAO,
+    DURACAO_RAPIDEZ,
+    FATOR_RAPIDEZ,
+    DURACAO_RELOGIO,
+    FATOR_RELOGIO,
     VIDAS_MAXIMAS,
     VIDAS_INICIAIS,
     VERMELHO,
@@ -41,7 +49,11 @@ class Fase:
         self.letras = []
         self.coracoes = []
         self.sapatos = []
+        self.raios = []
+        self.relogios = []
         self.fim_lentidao = 0
+        self.fim_efeito_queda = 0
+        self.fator_queda = 1
         self.velocidade_original = VEL_JOGADOR
         self.texto_aviso = ""
         self.tempo_aviso = 0
@@ -94,6 +106,9 @@ class Fase:
         self.letras = []
         self.coracoes = []
         self.sapatos = []
+        self.raios = []
+        self.relogios = []
+        self.fim_efeito_queda = 0
         self.texto_aviso = ""
         self.dialogos = []
         self.indice_dialogo = 0
@@ -144,12 +159,25 @@ class Fase:
                 cor = CINZA
             desenhar_coracao(tela, x_inicial + i * 40, 12, 28, cor)
 
+    # move uma letra; se raio/relógio estiver ativo, a queda muda de velocidade
+    def mover_letra(self, letra, tempo_atual):
+        if tempo_atual < self.fim_efeito_queda:
+            vel = letra.velocidade
+            letra.velocidade = vel * self.fator_queda
+            letra.mover()
+            letra.velocidade = vel
+        else:
+            letra.mover()
+
     # inicia desafio
     def iniciar_desafio(self):
         self.estado = "desafio"
         self.letras = []
         self.coracoes = []
         self.sapatos = []
+        self.raios = []
+        self.relogios = []
+        self.fim_efeito_queda = 0
         self.texto_aviso = ""
         self.frases_coletadas = 0
         self.vidas = VIDAS_INICIAIS
@@ -165,6 +193,9 @@ class Fase:
             jogador.velocidade = self.velocidade_original
             self.velocidade_original = None
             self.sapatos = []
+            self.raios = []
+            self.relogios = []
+            self.fim_efeito_queda = 0
 
         # Desenhar cenário e atualizar a hitbox da porta
         self.cenario.desenhar(self.numero_fase, tela)
@@ -213,14 +244,19 @@ class Fase:
             jogador.mover(teclas)
             tempo_atual = pygame.time.get_ticks()
 
-            # Gerar palavras, coração ou sapato aleatoriamente
+            # Gerar palavras, coração, sapato, raio ou relógio aleatoriamente
             if tempo_atual - self.ultimo_spawn >= self.intervalo_spawn:
                 sorteio = random.random()
-                if sorteio < CHANCE_CORACAO:
+                limite = CHANCE_CORACAO
+                if sorteio < limite:
                     self.coracoes.append(ItemCoracao(self.velocidade_letras))
-                elif sorteio < CHANCE_CORACAO + CHANCE_SAPATO:
+                elif sorteio < (limite := limite + CHANCE_SAPATO):
                     self.sapatos.append(ItemSapato(self.velocidade_letras))
-                elif sorteio < CHANCE_CORACAO + CHANCE_SAPATO + CHANCE_PROIBIDA:
+                elif sorteio < (limite := limite + CHANCE_RAIO):
+                    self.raios.append(ItemRaio(self.velocidade_letras))
+                elif sorteio < (limite := limite + CHANCE_RELOGIO):
+                    self.relogios.append(ItemRelogio(self.velocidade_letras))
+                elif sorteio < (limite := limite + CHANCE_PROIBIDA):
                     palavra = random.choice(self.palavras_proibidas)
                     self.letras.append(Letra(self.velocidade_letras, palavra, True))
                 else:
@@ -233,7 +269,7 @@ class Fase:
                 if self.estado != "desafio":
                     continue
 
-                letra.mover()
+                self.mover_letra(letra, tempo_atual)
                 letra.desenhar(tela)
 
                 if checar_colisao(jogador, letra):
@@ -252,6 +288,8 @@ class Fase:
                             self.letras = []
                             self.coracoes = []
                             self.sapatos = []
+                            self.raios = []
+                            self.relogios = []
                             self.ultimo_spawn = pygame.time.get_ticks()
 
                 # palavra chegou no chão sem ninguém pegar: some
@@ -305,6 +343,45 @@ class Fase:
                 elif sapato.saiu_da_tela():
                     self.sapatos.remove(sapato)
 
+            # Movimentação e coleta dos raios (letras caem mais rápido)
+            for raio in self.raios[:]:
+                if self.estado != "desafio":
+                    continue
+
+                raio.mover()
+                raio.desenhar(tela)
+
+                if checar_colisao(jogador, raio):
+                    self.raios.remove(raio)
+
+                    self.fator_queda = FATOR_RAPIDEZ
+                    self.fim_efeito_queda = tempo_atual + DURACAO_RAPIDEZ
+                    self.texto_aviso = "Letras rápidas!"
+                    self.tempo_aviso = tempo_atual
+
+                # raio chegou no chão sem ninguém pegar: some
+                elif raio.saiu_da_tela():
+                    self.raios.remove(raio)
+
+            # Movimentação e coleta dos relógios (letras caem mais devagar)
+            for relogio in self.relogios[:]:
+                if self.estado != "desafio":
+                    continue
+
+                relogio.mover()
+                relogio.desenhar(tela)
+
+                if checar_colisao(jogador, relogio):
+                    self.relogios.remove(relogio)
+                    self.fator_queda = FATOR_RELOGIO
+                    self.fim_efeito_queda = tempo_atual + DURACAO_RELOGIO
+                    self.texto_aviso = "Letras lentas!"
+                    self.tempo_aviso = tempo_atual
+
+                # relógio chegou no chão sem ninguém pegar: some
+                elif relogio.saiu_da_tela():
+                    self.relogios.remove(relogio)
+
             # acabou o tempo da lentidão, volta ao normal
             if self.velocidade_original is not None and tempo_atual >= self.fim_lentidao:
                 jogador.velocidade = self.velocidade_original
@@ -314,7 +391,7 @@ class Fase:
 
             # aviso embaixo dos corações do HUD por 1 segundo
             if self.texto_aviso != "" and tempo_atual - self.tempo_aviso < 1000:
-                self.desenhar_texto(tela, self.texto_aviso, self.fonte, tela.get_width() - 160, 60, (255, 120, 120))
+                self.desenhar_texto(tela, self.texto_aviso, self.fonte, tela.get_width() - 190, 60, (255, 120, 120))
 
         # ESTADO 5: FASE CONCLUÍDA
         elif self.estado == "concluida":
@@ -367,7 +444,6 @@ class Fase:
                 self.frases_coletadas = 0
                 self.vidas = VIDAS_INICIAIS
                 self.reinicios = REINICIOS
-
 
         # Desenhar jogador por último
         jogador.desenhar(tela)
