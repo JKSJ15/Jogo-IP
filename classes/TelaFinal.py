@@ -8,12 +8,16 @@ PALAVRAS_DERROTA = ["BREAK", "NONE", "XOR", "NAND", "NIVAN", "GLOBAL", "CONTINUE
 
 
 class TelaFinal:
-    def __init__(self, tipo, info=""):
+    def __init__(self, tipo, info="", estatisticas=None):
         self.tipo = tipo          # Representa a vitoria ou derrota do jogador
-        self.info = info          
-        self.opcoes = ["Jogar de novo", "Sair"]
+        self.info = info
+        self.etapa = "resumo"
+        self.opcoes = ["Continue"]
         self.selecionada = 0
         self.tempo_inicio = pygame.time.get_ticks()
+
+        # Estatísticas da partida
+        self.estatisticas = estatisticas or {}
 
         # Fontes
         self.fonte_titulo = pygame.font.Font(None, 100)
@@ -26,8 +30,8 @@ class TelaFinal:
         largura = 320
         altura = 60
         x = (LARGURA_TELA - largura) // 2
-        for i in range(len(self.opcoes)):
-            self.botoes.append(pygame.Rect(x, 420 + i * 85, largura, altura))
+        for i in range(2):
+            self.botoes.append(pygame.Rect(x, 470 + i * 85, largura, altura))
 
         # Partículas: confetes na vitória, palavras proibidas caindo na derrota
         if self.tipo == "vitoria":
@@ -94,9 +98,32 @@ class TelaFinal:
             info = self.fonte_texto.render(self.info, True, (200, 200, 200))
             tela.blit(info, info.get_rect(center=(LARGURA_TELA // 2, 305)))
 
+    # exibe as estatísticas acumuladas durante a partida
+    def desenhar_resumo(self, tela):
+        titulo = self.fonte_texto.render("Resumo da jornada", True, BRANCO)
+        tela.blit(titulo, titulo.get_rect(center=(LARGURA_TELA // 2, 350)))
+
+        itens = [
+            ("Palavras permitidas", "palavras_permitidas"),
+            ("Palavras proibidas", "palavras_proibidas"),
+            ("Corações", "coracoes"),
+            ("Raios", "raios"),
+            ("Relógios", "relogios"),
+            ("Sapatos", "sapatos"),
+        ]
+
+        posicoes_x = [LARGURA_TELA // 2 - 150, LARGURA_TELA // 2 + 150]
+        for i, (nome, chave) in enumerate(itens):
+            coluna = i % 2
+            linha = i // 2
+            valor = self.estatisticas.get(chave, 0)
+            texto = self.fonte_pequena.render(f"{nome}: {valor}", True, BRANCO)
+            texto_rect = texto.get_rect(center=(posicoes_x[coluna], 390 + linha * 25))
+            tela.blit(texto, texto_rect)
+
     # botões; o selecionado fica amarelo
     def desenhar_botoes(self, tela):
-        for i in range(len(self.botoes)):
+        for i in range(len(self.opcoes)):
             rect = self.botoes[i]
             if i == self.selecionada:
                 cor_fundo = (60, 60, 110)
@@ -114,8 +141,15 @@ class TelaFinal:
         )
         tela.blit(dica, dica.get_rect(center=(LARGURA_TELA // 2, ALTURA_TELA - 30)))
 
-    # devolve "reiniciar" ou "sair" conforme o botão selecionado
+    # controla a passagem do resumo para o menu e as opções finais
     def escolher(self):
+        if self.etapa == "resumo":
+            self.etapa = "menu"
+            self.opcoes = ["Jogar de novo", "Sair"]
+            self.selecionada = 0
+            self.tempo_inicio = pygame.time.get_ticks()
+            return ""
+
         if self.selecionada == 0:
             return "reiniciar"
         return "sair"
@@ -132,6 +166,10 @@ class TelaFinal:
 
         self.atualizar_particulas(tela)
         self.desenhar_titulo(tela, tempo)
+
+        if self.etapa == "resumo":
+            self.desenhar_resumo(tela)
+
         self.desenhar_botoes(tela)
 
         # espera 0,8 s antes de aceitar comandos, pra ninguém confirmar sem querer
@@ -147,13 +185,13 @@ class TelaFinal:
 
                 # mouse em cima de um botão seleciona ele
                 elif evento.type == pygame.MOUSEMOTION:
-                    for i in range(len(self.botoes)):
+                    for i in range(len(self.opcoes)):
                         if self.botoes[i].collidepoint(evento.pos):
                             self.selecionada = i
 
                 # clique com o botão esquerdo confirma
                 elif evento.type == pygame.MOUSEBUTTONDOWN and evento.button == 1:
-                    for i in range(len(self.botoes)):
+                    for i in range(len(self.opcoes)):
                         if self.botoes[i].collidepoint(evento.pos):
                             self.selecionada = i
                             acao = self.escolher()

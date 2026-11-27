@@ -1,3 +1,4 @@
+
 import pygame
 from classes.Jogador import Jogador
 from classes.Porta import Porta
@@ -30,10 +31,20 @@ def main():
         VEL_JOGADOR
     )
 
+    # Estatísticas da partida
+    estatisticas = {
+        "palavras_permitidas": 0,
+        "palavras_proibidas": 0,
+        "coracoes": 0,
+        "raios": 0,
+        "relogios": 0,
+        "sapatos": 0
+    }
+
     # Fases
-    fase1 = Fase(1)
-    fase2 = Fase(2)
-    fase3 = Fase(3)
+    fase1 = Fase(1, estatisticas)
+    fase2 = Fase(2, estatisticas)
+    fase3 = Fase(3, estatisticas)
 
     # variáveis de controle
     fase_atual = fase1
@@ -64,7 +75,11 @@ def main():
                 if fase_atual.numero_fase == 3:
                     # passou pela última fase: tela de vitória
                     estado_jogo = "fim"
-                    tela_final = TelaFinal("vitoria", "Você passou pelas 3 fases!")
+                    tela_final = TelaFinal(
+                        "vitoria",
+                        "Você passou pelas 3 fases!",
+                        estatisticas
+                    )
                 else:
                     if fase_atual.numero_fase == 1:
                         fase_atual = fase2
@@ -81,7 +96,8 @@ def main():
                 estado_jogo = "fim"
                 tela_final = TelaFinal(
                     "derrota",
-                    f"Você não passou da fase {fase_atual.numero_fase} - sala {fase_atual.nome_sala}"
+                    f"Você não passou da fase {fase_atual.numero_fase} - sala {fase_atual.nome_sala}",
+                    estatisticas
                 )
 
         # TELA FINAL (vitória ou derrota)
@@ -90,9 +106,12 @@ def main():
 
             if acao == "reiniciar":
                 # começa tudo do zero
-                fase1 = Fase(1)
-                fase2 = Fase(2)
-                fase3 = Fase(3)
+                for chave in estatisticas:
+                    estatisticas[chave] = 0
+
+                fase1 = Fase(1, estatisticas)
+                fase2 = Fase(2, estatisticas)
+                fase3 = Fase(3, estatisticas)
                 fase_atual = fase1
                 jogador.x = X_JOGADOR
                 jogador.y = Y_JOGADOR
