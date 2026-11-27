@@ -130,6 +130,27 @@ class Fase:
         pygame.draw.rect(tela, (255, 255, 255), fundo, 2, border_radius=8)
         tela.blit(imagem, (x, y))
 
+    # pra fazer as palavras do dialogo caberem no retângulo, no fundo
+    def quebrar_texto(self, texto, fonte, largura_max):
+        palavras = texto.split(" ")
+        linhas = []
+        linha_atual = ""
+        for palavra in palavras:
+            if linha_atual == "":
+                teste = palavra
+            else:
+                teste = linha_atual + " " + palavra
+
+            if fonte.size(teste)[0] <= largura_max:
+                linha_atual = teste
+            else:
+                if linha_atual:
+                    linhas.append(linha_atual)
+                linha_atual = palavra
+        if linha_atual:
+            linhas.append(linha_atual)
+        return linhas    
+
     # desenha caixa de texto
     def desenhar_caixa(self, tela, texto):
         largura = 700
@@ -138,7 +159,9 @@ class Fase:
         y = tela.get_height() - altura - 25
         pygame.draw.rect(tela, (20, 20, 40), (x, y, largura, altura), border_radius=10)
         pygame.draw.rect(tela, (255, 255, 255), (x, y, largura, altura), 3, border_radius=10)
-        self.desenhar_texto(tela, texto, self.fonte, x + 20, y + 25)
+        linhas = self.quebrar_texto(texto, self.fonte, largura - 40)
+        for i, linha in enumerate(linhas):
+            self.desenhar_texto(tela, linha, self.fonte, x + 20, y + 15 + i * self.fonte.get_linesize())
         self.desenhar_texto(tela, "Pressione E", self.fonte_pequena, x + largura - 140, y + 70, (255, 220, 100))
 
     # desenha nome da tela ao iniciar

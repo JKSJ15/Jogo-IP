@@ -35,9 +35,9 @@ REINICIOS = 1
 VIDAS_INICIAIS = 3
 
 # PALAVRAS ----------------------
-VEL_LETRA_FASE1 = 4
-VEL_LETRA_FASE2 = 6
-VEL_LETRA_FASE3 = 8
+VEL_LETRA_FASE1 = 6
+VEL_LETRA_FASE2 = 8
+VEL_LETRA_FASE3 = 10
 INTERVALO_SPAWS = 500
 
 # PALAVRAS PERMITIDAS
@@ -166,7 +166,7 @@ DIALOGO_FASE2 = [
 DIALOGO_FASE3 = [
     "Olá, Tablito! Achou que seria fácil assim?",
     "Para conseguir aprovação e conseguir sair daqui, terá que passar por mim", 
-    "O temido Nivan",
+    "O temido Nivan!",
     "te garanto que não será tão fácil assim...",
     "Enfrente chuvas de assuntos e evite distrações",
     "Bom desafio, aguardo sua reprovação!"
