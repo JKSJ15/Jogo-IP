@@ -18,6 +18,10 @@ from constantes import (
 def main():
     # Inicializa e configura o pygame
     pygame.init()
+    pygame.mixer.init()
+    pygame.mixer.music.load("sons/fundo.mp3")
+    pygame.mixer.music.set_volume(0.3)
+    pygame.mixer.music.play(-1)
     tela = pygame.display.set_mode(
         (LARGURA_TELA, ALTURA_TELA)
     )
