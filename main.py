@@ -6,6 +6,7 @@ from classes.Fase import Fase
 from classes.TelaFinal import TelaFinal
 from classes.TelaInicial import TelaInicial
 from uteis.colisao import checar_colisao
+from uteis.audio import Audio
 from constantes import (
     LARGURA_TELA,
     ALTURA_TELA,
@@ -22,6 +23,10 @@ def main():
     pygame.mixer.music.load("sons/fundo.mp3")
     pygame.mixer.music.set_volume(0.3)
     pygame.mixer.music.play(-1)
+
+    # Carrega os efeitos sonoros
+    audio = Audio()
+
     tela = pygame.display.set_mode(
         (LARGURA_TELA, ALTURA_TELA)
     )
@@ -47,9 +52,9 @@ def main():
     }
 
     # Fases
-    fase1 = Fase(1, estatisticas)
-    fase2 = Fase(2, estatisticas)
-    fase3 = Fase(3, estatisticas)
+    fase1 = Fase(1, estatisticas, audio)
+    fase2 = Fase(2, estatisticas, audio)
+    fase3 = Fase(3, estatisticas, audio)
 
     # variáveis de controle
     fase_atual = fase1
@@ -124,9 +129,9 @@ def main():
                 for chave in estatisticas:
                     estatisticas[chave] = 0
 
-                fase1 = Fase(1, estatisticas)
-                fase2 = Fase(2, estatisticas)
-                fase3 = Fase(3, estatisticas)
+                fase1 = Fase(1, estatisticas, audio)
+                fase2 = Fase(2, estatisticas, audio)
+                fase3 = Fase(3, estatisticas, audio)
                 fase_atual = fase1
                 jogador.x = X_JOGADOR
                 jogador.y = Y_JOGADOR
@@ -134,7 +139,7 @@ def main():
 
             elif acao == "sair":
                 rodando = False
-                
+
         pygame.display.flip()
         clock.tick(FPS)
 
