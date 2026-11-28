@@ -4,6 +4,7 @@ from classes.Jogador import Jogador
 from classes.Porta import Porta
 from classes.Fase import Fase
 from classes.TelaFinal import TelaFinal
+from classes.TelaInicial import TelaInicial
 from uteis.colisao import checar_colisao
 from constantes import (
     LARGURA_TELA,
@@ -49,7 +50,8 @@ def main():
     # variáveis de controle
     fase_atual = fase1
     rodando = True
-    estado_jogo = "jogando"
+    estado_jogo = "inicio"
+    tela_inicial = TelaInicial()
     tela_final = TelaFinal("vitoria")
 
     # Loop principal
@@ -67,8 +69,17 @@ def main():
             rodando = False
         tela.fill((30, 30, 30))
 
+        # TELA INICIAL
+        if estado_jogo == "inicio":
+            acao = tela_inicial.atualizar(tela, eventos)
+
+            if acao == "iniciar":
+                estado_jogo = "jogando"
+            elif acao == "sair":
+                rodando = False
+
         # EXECUÇÃO DA FASE
-        if estado_jogo == "jogando":
+        elif estado_jogo == "jogando":
             venceu = fase_atual.iniciar(tela, teclas, jogador, eventos)
 
             if venceu:
